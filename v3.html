@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secret Shopper — Cloud Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e8e0f0 0%, #d4e4f7 25%, #f0e6f6 50%, #dce8f8 75%, #f2e8f0 100%);
+  background-size: 400% 400%;
+  animation: meshShift 20s ease infinite;
+  font-family: 'Outfit', sans-serif;
+  overflow: hidden;
+}
+
+@keyframes meshShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* iPhone Frame */
+.iphone-frame {
+  width: 393px;
+  height: 852px;
+  background: linear-gradient(160deg, #f8f6ff 0%, #eef2ff 40%, #f6f0ff 100%);
+  border-radius: 55px;
+  position: relative;
+  box-shadow:
+    0 0 0 2px #1a1a2e,
+    0 0 0 4px #2a2a3e,
+    0 30px 80px rgba(100, 80, 160, 0.3),
+    0 10px 30px rgba(100, 80, 160, 0.15),
+    inset 0 0 30px rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+}
+
+/* Status Bar */
+.status-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 54px;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 32px 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+.status-bar .time { font-weight: 700; font-size: 15px; }
+.status-bar .status-icons { display: flex; gap: 5px; align-items: center; font-size: 13px; }
+
+/* Dynamic Island */
+.dynamic-island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 126px;
+  height: 37px;
+  background: #1a1a2e;
+  border-radius: 20px;
+  z-index: 200;
+}
+
+/* Screen Container */
+.screen-container {
+  position: absolute;
+  top: 54px;
+  left: 0;
+  right: 0;
+  bottom: 96px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+.screen-container::-webkit-scrollbar { display: none; }
+
+.screen {
+  display: none;
+  padding: 16px 20px 20px;
+  animation: fadeIn 0.35s ease;
+  min-height: 100%;
+}
+.screen.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Bottom Nav */
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 96px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-top: 1px solid rgba(200, 190, 230, 0.25);
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding-top: 10px;
+  z-index: 100;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  color: #a0a0c0;
+  transition: all 0.25s ease;
+  padding: 4px 12px;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-item.active { color: #7c6bc4; }
+.nav-item .nav-icon { font-size: 24px; transition: transform 0.25s ease; }
+.nav-item.active .nav-icon { transform: scale(1.1); }
+.nav-item .nav-badge {
+  position: absolute;
+  top: -2px;
+  right: -6px;
+  background: linear-gradient(135deg, #e88fc4, #c47bdb);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nav-item .nav-icon-wrap { position: relative; }
+
+/* Home Indicator */
+.home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  background: rgba(26, 26, 46, 0.2);
+  border-radius: 3px;
+  z-index: 200;
+}
+
+/* Glass Card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 20px rgba(120, 100, 180, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.glass-card.clickable { cursor: pointer; }
+.glass-card.clickable:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 10px rgba(120, 100, 180, 0.12);
+}
+
+/* Typography */
+h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 28px;
+  color: #1a1a2e;
+  line-height: 1.15;
+}
+h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 22px;
+  color: #1a1a2e;
+  margin-bottom: 12px;
+}
+h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: #1a1a2e;
+}
+.section-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #8a80b8;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 10px;
+}
+.subtitle {
+  font-size: 13px;
+  color: #7a7a9a;
+  font-weight: 400;
+}
+.small { font-size: 12px; color: #9a9ab8; }
+
+/* Tags */
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.tag-green { background: rgba(100, 200, 150, 0.15); color: #3a9a6a; }
+.tag-blue { background: rgba(120, 140, 220, 0.15); color: #5a6ac4; }
+.tag-purple { background: rgba(160, 120, 220, 0.15); color: #7c6bc4; }
+.tag-pink { background: rgba(220, 120, 180, 0.15); color: #c45a9a; }
+.tag-orange { background: rgba(230, 160, 80, 0.15); color: #c48a3a; }
+.tag-red { background: rgba(220, 100, 100, 0.15); color: #c45a5a; }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary {
+  background: linear-gradient(135deg, #9b8cd8, #7c6bc4);
+  color: white;
+  box-shadow: 0 4px 15px rgba(124, 107, 196, 0.3);
+}
+.btn-secondary {
+  background: rgba(124, 107, 196, 0.1);
+  color: #7c6bc4;
+}
+.btn-full { width: 100%; }
+
+/* Back Button */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #7c6bc4;
+  cursor: pointer;
+  margin-bottom: 14px;
+  transition: all 0.2s ease;
+}
+.back-btn:active { transform: scale(0.96); }
+
+/* Progress Bar */
+.progress-bar {
+  height: 6px;
+  background: rgba(124, 107, 196, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 6px 0;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #9b8cd8, #7c6bc4);
+  transition: width 0.6s ease;
+}
+
+/* Emoji Icon */
+.emoji-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  font-size: 22px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 2px 8px rgba(120, 100, 180, 0.08);
+  flex-shrink: 0;
+}
+.emoji-icon-lg {
+  width: 64px;
+  height: 64px;
+  font-size: 32px;
+  border-radius: 18px;
+}
+.emoji-icon-sm {
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  border-radius: 11px;
+}
+
+/* Horizontal Scroll */
+.h-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: none;
+  margin: 0 -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.h-scroll::-webkit-scrollbar { display: none; }
+
+/* Flex helpers */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-8 { gap: 8px; }
+.gap-10 { gap: 10px; }
+.gap-12 { gap: 12px; }
+.gap-14 { gap: 14px; }
+.flex-1 { flex: 1; }
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.float { animation: float 4s ease-in-out infinite; }
+.float-delay { animation: float 4s ease-in-out 1s infinite; }
+.float-delay-2 { animation: float 4s ease-in-out 2s infinite; }
+
+/* Breathing glow */
+@keyframes breathe {
+  0%, 100% { box-shadow: 0 4px 20px rgba(120, 100, 180, 0.08); }
+  50% { box-shadow: 0 6px 30px rgba(120, 100, 180, 0.15); }
+}
+.breathe { animation: breathe 3s ease-in-out infinite; }
+
+/* Tab Bar */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(124, 107, 196, 0.08);
+  border-radius: 14px;
+  padding: 4px;
+  margin-bottom: 16px;
+}
+.tab {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 11px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #8a80b8;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab.active {
+  background: white;
+  color: #7c6bc4;
+  box-shadow: 0 2px 8px rgba(120, 100, 180, 0.1);
+}
+
+/* Inbox List Item */
+.inbox-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(200, 190, 230, 0.15);
+}
+.inbox-item:last-child { border-bottom: none; }
+
+/* SVG Chart */
+.chart-container {
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 16px;
+  padding: 16px;
+  margin: 12px 0;
+}
+
+/* Wallet card */
+.wallet-card {
+  background: linear-gradient(135deg, rgba(155, 140, 216, 0.15), rgba(124, 107, 196, 0.08));
+  border: 1px solid rgba(155, 140, 216, 0.2);
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 12px;
+}
+
+/* Brand pill */
+.brand-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 68px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.brand-pill .emoji-icon { position: relative; }
+.brand-pill .brand-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid white;
+  font-size: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.brand-pill span {
+  font-size: 11px;
+  font-weight: 500;
+  color: #5a5a7a;
+}
+
+/* Deal card */
+.deal-card {
+  min-width: 160px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  padding: 14px;
+  flex-shrink: 0;
+}
+
+/* Shield Score */
+.shield-score {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(100, 200, 150, 0.15), rgba(100, 200, 150, 0.05));
+  border: 2px solid rgba(100, 200, 150, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.shield-score .grade {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #3a9a6a;
+  line-height: 1;
+}
+.shield-score .label { font-size: 9px; color: #3a9a6a; font-weight: 600; }
+
+/* Copy button */
+.copy-btn {
+  background: rgba(124, 107, 196, 0.1);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: #7c6bc4;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Confidence bar */
+.confidence-bar {
+  height: 4px;
+  background: rgba(124, 107, 196, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  width: 80px;
+}
+.confidence-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #9b8cd8, #7c6bc4);
+  border-radius: 2px;
+}
+
+/* Action buttons row */
+.action-row {
+  display: flex;
+  gap: 8px;
+}
+.action-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 14px;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #5a5a7a;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Transaction item */
+.tx-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(200, 190, 230, 0.1);
+}
+.tx-item:last-child { border-bottom: none; }
+
+/* Blocked summary */
+.blocked-summary {
+  background: linear-gradient(135deg, rgba(220, 100, 100, 0.08), rgba(220, 100, 100, 0.03));
+  border: 1px solid rgba(220, 100, 100, 0.15);
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+.blocked-count {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #c45a5a;
+}
+
+/* AI sparkle */
+.ai-sparkle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9b8cd8;
+}
+.ai-sparkle::before { content: "✨"; font-size: 12px; }
+
+/* Price strikethrough */
+.price-was {
+  text-decoration: line-through;
+  color: #b0b0c8;
+  font-size: 12px;
+}
+.price-now {
+  font-weight: 700;
+  color: #1a1a2e;
+  font-size: 16px;
+}
+.price-save {
+  font-size: 11px;
+  font-weight: 600;
+  color: #3a9a6a;
+}
+</style>
+</head>
+<body>
+
+<div class="iphone-frame">
+  <!-- Dynamic Island -->
+  <div class="dynamic-island"></div>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="status-icons">
+      <span>&#9679;&#9679;&#9679;&#9679;</span>
+      <span>WiFi</span>
+      <span>100%</span>
+    </div>
+  </div>
+
+  <!-- Screen Container -->
+  <div class="screen-container">
+
+    <!-- ========== SCREEN 1: DASHBOARD ========== -->
+    <div class="screen active" id="screen-home">
+      <!-- Greeting -->
+      <div class="flex items-center justify-between" style="margin-bottom: 18px;">
+        <div>
+          <p class="subtitle">Good morning</p>
+          <h1>Gabi</h1>
+        </div>
+        <div class="emoji-icon emoji-icon-lg float" style="background: linear-gradient(135deg, rgba(200, 180, 240, 0.3), rgba(180, 200, 255, 0.3));">
+          🌸
+        </div>
+      </div>
+
+      <!-- Packages in Transit -->
+      <p class="section-label">Packages in Transit</p>
+      <div class="glass-card breathe">
+        <!-- Nike -->
+        <div class="flex gap-12 items-center" style="margin-bottom: 14px;">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #f0f0f0, #e8e8e8);">👟</div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <div>
+                <p style="font-weight: 600; font-size: 14px; color: #1a1a2e;">Nike</p>
+                <p class="small">Out for delivery — Philadelphia, PA</p>
+              </div>
+              <span class="tag tag-green">Today</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 92%;"></div></div>
+          </div>
+        </div>
+        <!-- Apple -->
+        <div class="flex gap-12 items-center" style="margin-bottom: 14px;">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #f5f5f7, #e8e8ec);">📱</div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <div>
+                <p style="font-weight: 600; font-size: 14px; color: #1a1a2e;">Apple</p>
+                <p class="small">In transit — Memphis, TN</p>
+              </div>
+              <span class="tag tag-blue">Mar 13</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 55%;"></div></div>
+          </div>
+        </div>
+        <!-- Glossier -->
+        <div class="flex gap-12 items-center">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #fff0f5, #fce4ec);">💄</div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <div>
+                <p style="font-weight: 600; font-size: 14px; color: #1a1a2e;">Glossier</p>
+                <p class="small">Label created</p>
+              </div>
+              <span class="tag tag-purple">Mar 16</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 15%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Brand Row -->
+      <p class="section-label">Your Brands</p>
+      <div class="h-scroll" style="margin-bottom: 18px;">
+        <div class="brand-pill" onclick="showScreen('screen-nike')">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #f0f0f0, #e8e8e8);">
+            👟
+            <div class="brand-badge" style="background: #4ade80;">📦</div>
+          </div>
+          <span>Nike</span>
+        </div>
+        <div class="brand-pill">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #f5f5f7, #e8e8ec);">
+            🍎
+            <div class="brand-badge" style="background: #60a5fa;">🚚</div>
+          </div>
+          <span>Apple</span>
+        </div>
+        <div class="brand-pill" onclick="showScreen('screen-cart')">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #fff8e1, #fff3cd);">
+            📦
+            <div class="brand-badge" style="background: #f59e0b;">🛒</div>
+          </div>
+          <span>Amazon</span>
+        </div>
+        <div class="brand-pill">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #fff0f5, #fce4ec);">
+            💄
+            <div class="brand-badge" style="background: #c084fc;">✨</div>
+          </div>
+          <span>Glossier</span>
+        </div>
+        <div class="brand-pill">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #e8f5e9, #dcedc8);">
+            🏔️
+            <div class="brand-badge" style="background: #4ade80;">✓</div>
+          </div>
+          <span>REI</span>
+        </div>
+        <div class="brand-pill">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #e3f2fd, #bbdefb);">
+            🧥
+          </div>
+          <span>Patagonia</span>
+        </div>
+      </div>
+
+      <!-- Recent Deals -->
+      <p class="section-label">Hot Deals</p>
+      <div class="h-scroll" style="margin-bottom: 18px;">
+        <div class="deal-card">
+          <div class="flex gap-8 items-center" style="margin-bottom: 8px;">
+            <span style="font-size: 18px;">📦</span>
+            <span style="font-weight: 600; font-size: 13px; color: #1a1a2e;">Amazon</span>
+          </div>
+          <p style="font-size: 22px; font-weight: 700; color: #c45a5a; font-family: 'Cormorant Garamond', serif;">-32%</p>
+          <p class="small">Lightning Deal</p>
+          <span class="tag tag-red" style="margin-top: 6px;">⚡ 2h left</span>
+        </div>
+        <div class="deal-card">
+          <div class="flex gap-8 items-center" style="margin-bottom: 8px;">
+            <span style="font-size: 18px;">👟</span>
+            <span style="font-weight: 600; font-size: 13px; color: #1a1a2e;">Nike</span>
+          </div>
+          <p style="font-size: 22px; font-weight: 700; color: #3a9a6a; font-family: 'Cormorant Garamond', serif;">25% off</p>
+          <p class="small">Clearance Event</p>
+          <span class="tag tag-green" style="margin-top: 6px;">Active</span>
+        </div>
+        <div class="deal-card">
+          <div class="flex gap-8 items-center" style="margin-bottom: 8px;">
+            <span style="font-size: 18px;">🏔️</span>
+            <span style="font-weight: 600; font-size: 13px; color: #1a1a2e;">REI</span>
+          </div>
+          <p style="font-size: 22px; font-weight: 700; color: #5a6ac4; font-family: 'Cormorant Garamond', serif;">20% off</p>
+          <p class="small">Anniversary Sale</p>
+          <span class="tag tag-blue" style="margin-top: 6px;">5 days left</span>
+        </div>
+      </div>
+
+      <!-- Abandoned Carts -->
+      <p class="section-label">Abandoned Carts</p>
+      <div class="glass-card clickable" onclick="showScreen('screen-cart')">
+        <div class="flex gap-12 items-center">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #fff8e1, #fff3cd);">🛒</div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <p style="font-weight: 600; font-size: 14px; color: #1a1a2e;">Amazon Cart</p>
+              <p style="font-weight: 700; font-size: 16px; color: #1a1a2e;">$247.83</p>
+            </div>
+            <div class="flex justify-between items-center" style="margin-top: 3px;">
+              <p class="small">3 items · 3 days old</p>
+              <span class="tag tag-orange">🕐 3d</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 10px; padding: 8px 12px; background: rgba(155, 140, 216, 0.08); border-radius: 12px;">
+          <p class="ai-sparkle">Promo likely in 2 days — wait it out</p>
+        </div>
+      </div>
+      <div class="glass-card">
+        <div class="flex gap-12 items-center">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #e8f5e9, #dcedc8);">🛒</div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <p style="font-weight: 600; font-size: 14px; color: #1a1a2e;">REI Cart</p>
+              <p style="font-weight: 700; font-size: 16px; color: #1a1a2e;">$134.99</p>
+            </div>
+            <p class="small" style="margin-top: 3px;">1 item · 7 days old</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shared Wishlists -->
+      <p class="section-label">Shared Wishlists</p>
+      <div class="glass-card">
+        <div class="flex gap-12 items-center">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #fce4ec, #f8bbd0);">🎂</div>
+          <div class="flex-1">
+            <p style="font-weight: 600; font-size: 14px; color: #1a1a2e;">Birthday Picks 2026</p>
+            <p class="small">8 items · Shared with 3 people</p>
+          </div>
+          <span style="font-size: 16px; color: #b0b0c8;">›</span>
+        </div>
+      </div>
+
+      <div style="height: 20px;"></div>
+    </div>
+
+    <!-- ========== SCREEN 2: CART DETAIL ========== -->
+    <div class="screen" id="screen-cart">
+      <button class="back-btn" onclick="showScreen('screen-home')">‹ Back</button>
+
+      <div class="flex gap-12 items-center" style="margin-bottom: 18px;">
+        <div class="emoji-icon emoji-icon-lg" style="background: linear-gradient(135deg, #fff8e1, #fff3cd);">📦</div>
+        <div>
+          <h1>Amazon</h1>
+          <p class="subtitle">Cart · 3 items · $247.83</p>
+        </div>
+      </div>
+
+      <!-- Items -->
+      <p class="section-label">Items</p>
+      <div class="glass-card">
+        <div class="flex gap-12" style="margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(200, 190, 230, 0.15);">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #e3f2fd, #bbdefb);">🎧</div>
+          <div class="flex-1">
+            <p style="font-weight: 600; font-size: 13px; color: #1a1a2e;">Sony WH-1000XM5</p>
+            <p class="small">Wireless Noise Cancelling</p>
+            <div class="flex gap-8 items-center" style="margin-top: 4px;">
+              <span class="price-now">$328.00</span>
+              <span class="price-was">$399.99</span>
+              <span class="price-save">-$72</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-12" style="margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(200, 190, 230, 0.15);">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #e8eaf6, #c5cae9);">🔌</div>
+          <div class="flex-1">
+            <p style="font-weight: 600; font-size: 13px; color: #1a1a2e;">Anker USB-C Hub</p>
+            <p class="small">7-in-1 Adapter</p>
+            <div style="margin-top: 4px;">
+              <span class="price-now">$34.99</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-12">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #fff3e0, #ffe0b2);">📘</div>
+          <div class="flex-1">
+            <p style="font-weight: 600; font-size: 13px; color: #1a1a2e;">Designing Data-Intensive Apps</p>
+            <p class="small">Martin Kleppmann</p>
+            <div class="flex gap-8 items-center" style="margin-top: 4px;">
+              <span class="price-now">$33.36</span>
+              <span class="price-was">$44.99</span>
+              <span class="price-save">-$12</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Price History Chart -->
+      <p class="section-label">Cart Price History</p>
+      <div class="glass-card">
+        <div class="chart-container">
+          <svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto;">
+            <defs>
+              <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(155, 140, 216, 0.3)" />
+                <stop offset="100%" stop-color="rgba(155, 140, 216, 0)" />
+              </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <line x1="0" y1="30" x2="300" y2="30" stroke="rgba(155,140,216,0.1)" stroke-width="0.5"/>
+            <line x1="0" y1="60" x2="300" y2="60" stroke="rgba(155,140,216,0.1)" stroke-width="0.5"/>
+            <line x1="0" y1="90" x2="300" y2="90" stroke="rgba(155,140,216,0.1)" stroke-width="0.5"/>
+            <!-- Area fill -->
+            <path d="M0,20 C30,22 60,25 90,35 C120,45 150,30 180,50 C210,65 240,60 270,75 L300,85 L300,120 L0,120 Z" fill="url(#chartGrad)" />
+            <!-- Line -->
+            <path d="M0,20 C30,22 60,25 90,35 C120,45 150,30 180,50 C210,65 240,60 270,75 L300,85" fill="none" stroke="#9b8cd8" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- Current dot -->
+            <circle cx="300" cy="85" r="5" fill="#7c6bc4" stroke="white" stroke-width="2"/>
+            <!-- Labels -->
+            <text x="0" y="115" font-size="9" fill="#9a9ab8" font-family="Outfit">Sep</text>
+            <text x="55" y="115" font-size="9" fill="#9a9ab8" font-family="Outfit">Oct</text>
+            <text x="110" y="115" font-size="9" fill="#9a9ab8" font-family="Outfit">Nov</text>
+            <text x="165" y="115" font-size="9" fill="#9a9ab8" font-family="Outfit">Dec</text>
+            <text x="220" y="115" font-size="9" fill="#9a9ab8" font-family="Outfit">Jan</text>
+            <text x="275" y="115" font-size="9" fill="#9a9ab8" font-family="Outfit">Feb</text>
+            <!-- Price labels -->
+            <text x="275" y="10" font-size="9" fill="#7c6bc4" font-family="Outfit" font-weight="600">$320</text>
+            <text x="5" y="15" font-size="9" fill="#9a9ab8" font-family="Outfit">$392</text>
+          </svg>
+        </div>
+        <div class="flex justify-between items-center" style="margin-top: 4px;">
+          <p class="small">6 month trend</p>
+          <span class="tag tag-green">▼ $72 from peak</span>
+        </div>
+      </div>
+
+      <!-- AI Prediction -->
+      <p class="section-label">AI Prediction</p>
+      <div class="glass-card float-delay" style="background: linear-gradient(135deg, rgba(155, 140, 216, 0.12), rgba(180, 200, 255, 0.08)); border-color: rgba(155, 140, 216, 0.25);">
+        <div class="flex gap-8 items-center" style="margin-bottom: 10px;">
+          <span style="font-size: 20px;">🔮</span>
+          <h3>Wait 2 More Days</h3>
+        </div>
+        <p style="font-size: 13px; color: #5a5a7a; line-height: 1.5; margin-bottom: 10px;">
+          Amazon typically sends a 10-15% comeback code after 5 days of cart abandonment. You're at day 3 — hold tight.
+        </p>
+        <div class="flex justify-between items-center">
+          <div class="flex gap-8 items-center">
+            <span class="small">Confidence</span>
+            <div class="confidence-bar"><div class="confidence-fill" style="width: 78%;"></div></div>
+            <span style="font-size: 12px; font-weight: 600; color: #7c6bc4;">78%</span>
+          </div>
+          <span class="tag tag-purple">Day 3 of 5</span>
+        </div>
+      </div>
+
+      <!-- Checkout -->
+      <div class="glass-card">
+        <div class="flex justify-between items-center" style="margin-bottom: 12px;">
+          <div>
+            <p class="small">Wallet Balance</p>
+            <p style="font-size: 24px; font-weight: 700; color: #1a1a2e; font-family: 'Cormorant Garamond', serif;">$400.00</p>
+          </div>
+          <span class="tag tag-green">Sufficient</span>
+        </div>
+        <button class="btn btn-primary btn-full">Approve $247.83</button>
+      </div>
+
+      <div style="height: 20px;"></div>
+    </div>
+
+    <!-- ========== SCREEN 3: RETAILER PROFILE (Nike) ========== -->
+    <div class="screen" id="screen-nike">
+      <button class="back-btn" onclick="showScreen('screen-home')">‹ Back</button>
+
+      <div class="flex gap-14 items-center" style="margin-bottom: 20px;">
+        <div class="emoji-icon emoji-icon-lg float" style="background: linear-gradient(135deg, #f0f0f0, #e8e8e8);">👟</div>
+        <div class="flex-1">
+          <h1>Nike</h1>
+          <p class="subtitle">Member since 2023 · 12 orders</p>
+        </div>
+        <div class="shield-score">
+          <div class="grade">A-</div>
+          <div class="label">SHIELD</div>
+        </div>
+      </div>
+
+      <!-- Shield Breakdown -->
+      <p class="section-label">Privacy Shield</p>
+      <div class="glass-card">
+        <div class="flex justify-between items-center" style="margin-bottom: 12px;">
+          <div class="flex gap-8 items-center">
+            <span style="font-size: 16px;">📧</span>
+            <span style="font-size: 13px; font-weight: 500; color: #1a1a2e;">Email Spam</span>
+          </div>
+          <span class="tag tag-green">Low</span>
+        </div>
+        <div class="flex justify-between items-center" style="margin-bottom: 12px;">
+          <div class="flex gap-8 items-center">
+            <span style="font-size: 16px;">🔗</span>
+            <span style="font-size: 13px; font-weight: 500; color: #1a1a2e;">Data Sharing</span>
+          </div>
+          <span class="tag tag-orange">Medium</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <div class="flex gap-8 items-center">
+            <span style="font-size: 16px;">🎭</span>
+            <span style="font-size: 13px; font-weight: 500; color: #1a1a2e;">Dark Patterns</span>
+          </div>
+          <span class="tag tag-green">None</span>
+        </div>
+      </div>
+
+      <!-- Email Alias -->
+      <p class="section-label">Email Alias</p>
+      <div class="glass-card">
+        <div class="flex justify-between items-center">
+          <div>
+            <p style="font-size: 14px; font-weight: 500; color: #1a1a2e; font-family: monospace; letter-spacing: -0.3px;">gabi.xk7m@secretshopper.me</p>
+            <p class="small" style="margin-top: 2px;">Forwards to your inbox</p>
+          </div>
+          <button class="copy-btn" onclick="this.textContent='Copied!'; setTimeout(() => this.textContent='Copy', 1500);">Copy</button>
+        </div>
+      </div>
+
+      <!-- Wallet -->
+      <p class="section-label">Wallet</p>
+      <div class="wallet-card">
+        <div class="flex justify-between items-center">
+          <div>
+            <p class="small">Nike Balance</p>
+            <p style="font-size: 28px; font-weight: 700; color: #1a1a2e; font-family: 'Cormorant Garamond', serif;">$150.00</p>
+          </div>
+          <button class="btn btn-secondary" style="font-size: 12px; padding: 8px 14px;">+ Add Funds</button>
+        </div>
+      </div>
+
+      <!-- Return Windows -->
+      <p class="section-label">Return Windows</p>
+      <div class="glass-card">
+        <div class="flex gap-12" style="margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(200, 190, 230, 0.15);">
+          <div class="emoji-icon-sm emoji-icon" style="background: linear-gradient(135deg, #ffebee, #ffcdd2);">👟</div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <p style="font-weight: 600; font-size: 13px; color: #1a1a2e;">Air Max 90</p>
+              <span class="tag tag-red">4 days left</span>
+            </div>
+            <p class="small">Return by Mar 15</p>
+            <div class="progress-bar" style="margin-top: 4px;"><div class="progress-fill" style="width: 87%; background: linear-gradient(90deg, #e88fc4, #c45a5a);"></div></div>
+          </div>
+        </div>
+        <div class="flex gap-12">
+          <div class="emoji-icon-sm emoji-icon" style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9);">👕</div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <p style="font-weight: 600; font-size: 13px; color: #1a1a2e;">Dri-FIT Tee</p>
+              <span class="tag tag-green">22 days left</span>
+            </div>
+            <p class="small">Return by Apr 2</p>
+            <div class="progress-bar" style="margin-top: 4px;"><div class="progress-fill" style="width: 27%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order History -->
+      <p class="section-label">Order History</p>
+      <div class="glass-card">
+        <div class="flex justify-between items-center" style="padding: 8px 0; border-bottom: 1px solid rgba(200, 190, 230, 0.1);">
+          <div>
+            <p style="font-weight: 500; font-size: 13px; color: #1a1a2e;">Air Max 90 — White/Grey</p>
+            <p class="small">Feb 28, 2026</p>
+          </div>
+          <p style="font-weight: 600; font-size: 13px; color: #1a1a2e;">$139.99</p>
+        </div>
+        <div class="flex justify-between items-center" style="padding: 8px 0; border-bottom: 1px solid rgba(200, 190, 230, 0.1);">
+          <div>
+            <p style="font-weight: 500; font-size: 13px; color: #1a1a2e;">Dri-FIT Running Tee</p>
+            <p class="small">Mar 1, 2026</p>
+          </div>
+          <p style="font-weight: 600; font-size: 13px; color: #1a1a2e;">$45.00</p>
+        </div>
+        <div class="flex justify-between items-center" style="padding: 8px 0;">
+          <div>
+            <p style="font-weight: 500; font-size: 13px; color: #1a1a2e;">Pegasus 41</p>
+            <p class="small">Jan 12, 2026</p>
+          </div>
+          <p style="font-weight: 600; font-size: 13px; color: #1a1a2e;">$129.99</p>
+        </div>
+      </div>
+
+      <div style="height: 20px;"></div>
+    </div>
+
+    <!-- ========== SCREEN 4: INBOX ========== -->
+    <div class="screen" id="screen-inbox">
+      <h1 style="margin-bottom: 16px;">Inbox</h1>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab(this, 'inbox-tracking')">Tracking</button>
+        <button class="tab" onclick="switchTab(this, 'inbox-promos')">Promos</button>
+        <button class="tab" onclick="switchTab(this, 'inbox-blocked')">Blocked</button>
+      </div>
+
+      <!-- Tracking Tab -->
+      <div class="tab-content active" id="inbox-tracking">
+        <div class="glass-card">
+          <div class="inbox-item">
+            <div class="emoji-icon" style="background: linear-gradient(135deg, #f0f0f0, #e8e8e8);">👟</div>
+            <div class="flex-1">
+              <div class="flex justify-between items-center">
+                <p style="font-weight: 600; font-size: 13px; color: #1a1a2e;">Nike — Shipped!</p>
+                <p class="small">2h ago</p>
+              </div>
+              <p class="small" style="margin: 3px 0;">Your Air Max 90 is on the way</p>
+              <div class="flex gap-8">
+                <span class="tag tag-green">Tracking extracted</span>
+                <span class="tag tag-blue">Forwarded</span>
+              </div>
+            </div>
+          </div>
+          <div class="inbox-item">
+            <div class="emoji-icon" style="background: linear-gradient(135deg, #f5f5f7, #e8e8ec);">📱</div>
+            <div class="flex-1">
+              <div class="flex justify-between items-center">
+                <p style="font-weight: 600; font-size: 13px; color: #1a1a2e;">Apple — In Transit</p>
+                <p class="small">Yesterday</p>
+              </div>
+              <p class="small" style="margin: 3px 0;">MacBook Pro case — Memphis hub</p>
+              <div class="flex gap-8">
+                <span class="tag tag-green">Tracking extracted</span>
+                <span class="tag tag-blue">Forwarded</span>
+              </div>
+            </div>
+          </div>
+          <div class="inbox-item">
+            <div class="emoji-icon" style="background: linear-gradient(135deg, #fff0f5, #fce4ec);">💄</div>
+            <div class="flex-1">
+              <div class="flex justify-between items-center">
+                <p style="font-weight: 600; font-size: 13px; color: #1a1a2e;">Glossier — Confirmed</p>
+                <p class="small">2 days ago</p>
+              </div>
+              <p class="small" style="margin: 3px 0;">Order #GL-28491 confirmed</p>
+              <div class="flex gap-8">
+                <span class="tag tag-green">Tracking extracted</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Promos Tab -->
+      <div class="tab-content" id="inbox-promos" style="display: none;">
+        <div class="glass-card">
+          <div class="inbox-item">
+            <div class="emoji-icon" style="background: linear-gradient(135deg, #f0f0f0, #e8e8e8);">👟</div>
+            <div class="flex-1">
+              <div class="flex justify-between items-center">
+                <p style="font-weight: 600; font-size: 13px; color: #1a1a2e;">SAVE25</p>
+                <span class="tag tag-green">25% off</span>
+              </div>
+              <p class="small">Nike — Clearance event, ends Mar 18</p>
+            </div>
+          </div>
+          <div class="inbox-item">
+            <div class="emoji-icon" style="background: linear-gradient(135deg, #e8f5e9, #dcedc8);">🏔️</div>
+            <div class="flex-1">
+              <div class="flex justify-between items-center">
+                <p style="font-weight: 600; font-size: 13px; color: #1a1a2e;">SPRING15</p>
+                <span class="tag tag-green">15% off</span>
+              </div>
+              <p class="small">REI — Spring collection, sitewide</p>
+            </div>
+          </div>
+          <div class="inbox-item">
+            <div class="emoji-icon" style="background: linear-gradient(135deg, #fff8e1, #fff3cd);">📦</div>
+            <div class="flex-1">
+              <div class="flex justify-between items-center">
+                <p style="font-weight: 600; font-size: 13px; color: #1a1a2e;">COMEBACK10</p>
+                <span class="tag tag-green">10% off</span>
+              </div>
+              <p class="small">Amazon — Cart comeback code</p>
+              <div style="margin-top: 4px;">
+                <span class="tag tag-purple">✨ AI predicted this</span>
+              </div>
+            </div>
+          </div>
+          <div class="inbox-item">
+            <div class="emoji-icon" style="background: linear-gradient(135deg, #fff0f5, #fce4ec);">💄</div>
+            <div class="flex-1">
+              <div class="flex justify-between items-center">
+                <p style="font-weight: 600; font-size: 13px; color: #1a1a2e;">Free Shipping</p>
+                <span class="tag tag-blue">No min</span>
+              </div>
+              <p class="small">Glossier — Free shipping, no minimum</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blocked Tab -->
+      <div class="tab-content" id="inbox-blocked" style="display: none;">
+        <div class="blocked-summary">
+          <div class="blocked-count">47</div>
+          <p style="font-size: 13px; color: #c45a5a; font-weight: 500;">emails blocked this month</p>
+          <p class="small" style="margin-top: 4px;">Saving you ~2 hours of inbox noise</p>
+        </div>
+        <div class="glass-card">
+          <div class="inbox-item">
+            <div class="emoji-icon-sm emoji-icon" style="background: rgba(220, 100, 100, 0.08);">🚫</div>
+            <div class="flex-1">
+              <p style="font-weight: 500; font-size: 13px; color: #8a8a9a;">Nike — "You left something behind!"</p>
+              <p class="small">Marketing · Blocked 3h ago</p>
+            </div>
+          </div>
+          <div class="inbox-item">
+            <div class="emoji-icon-sm emoji-icon" style="background: rgba(220, 100, 100, 0.08);">🚫</div>
+            <div class="flex-1">
+              <p style="font-weight: 500; font-size: 13px; color: #8a8a9a;">Amazon — "Deals you might like"</p>
+              <p class="small">Marketing · Blocked 6h ago</p>
+            </div>
+          </div>
+          <div class="inbox-item">
+            <div class="emoji-icon-sm emoji-icon" style="background: rgba(220, 100, 100, 0.08);">🚫</div>
+            <div class="flex-1">
+              <p style="font-weight: 500; font-size: 13px; color: #8a8a9a;">REI — "Members-only preview"</p>
+              <p class="small">Marketing · Blocked yesterday</p>
+            </div>
+          </div>
+          <div class="inbox-item">
+            <div class="emoji-icon-sm emoji-icon" style="background: rgba(220, 100, 100, 0.08);">🚫</div>
+            <div class="flex-1">
+              <p style="font-weight: 500; font-size: 13px; color: #8a8a9a;">Glossier — "Your faves are back"</p>
+              <p class="small">Marketing · Blocked 2 days ago</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height: 20px;"></div>
+    </div>
+
+    <!-- ========== SCREEN 5: WALLET ========== -->
+    <div class="screen" id="screen-wallet">
+      <h1 style="margin-bottom: 4px;">Wallet</h1>
+      <p class="subtitle" style="margin-bottom: 20px;">Your shopping funds</p>
+
+      <!-- Total Balance -->
+      <div class="wallet-card breathe" style="text-align: center; padding: 24px;">
+        <p class="small" style="margin-bottom: 4px;">Total Balance</p>
+        <p style="font-size: 42px; font-weight: 700; color: #1a1a2e; font-family: 'Cormorant Garamond', serif; line-height: 1;">$725.00</p>
+        <p class="small" style="margin-top: 6px;">Across 4 retailer wallets</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-row" style="margin-bottom: 18px;">
+        <div class="action-btn">
+          <span style="font-size: 22px;">💳</span>
+          <span>Add Funds</span>
+        </div>
+        <div class="action-btn">
+          <span style="font-size: 22px;">↔️</span>
+          <span>Transfer</span>
+        </div>
+        <div class="action-btn">
+          <span style="font-size: 22px;">📋</span>
+          <span>History</span>
+        </div>
+      </div>
+
+      <!-- Per-retailer wallets -->
+      <p class="section-label">Retailer Wallets</p>
+      <div class="glass-card clickable" onclick="showScreen('screen-cart')">
+        <div class="flex gap-12 items-center">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #fff8e1, #fff3cd);">📦</div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <p style="font-weight: 600; font-size: 14px; color: #1a1a2e;">Amazon</p>
+              <p style="font-weight: 700; font-size: 18px; color: #1a1a2e; font-family: 'Cormorant Garamond', serif;">$400.00</p>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 55%;"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="glass-card clickable" onclick="showScreen('screen-nike')">
+        <div class="flex gap-12 items-center">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #f0f0f0, #e8e8e8);">👟</div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <p style="font-weight: 600; font-size: 14px; color: #1a1a2e;">Nike</p>
+              <p style="font-weight: 700; font-size: 18px; color: #1a1a2e; font-family: 'Cormorant Garamond', serif;">$150.00</p>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 21%;"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="glass-card">
+        <div class="flex gap-12 items-center">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #f5f5f7, #e8e8ec);">🍎</div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <p style="font-weight: 600; font-size: 14px; color: #1a1a2e;">Apple</p>
+              <p style="font-weight: 700; font-size: 18px; color: #1a1a2e; font-family: 'Cormorant Garamond', serif;">$125.00</p>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 17%;"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="glass-card">
+        <div class="flex gap-12 items-center">
+          <div class="emoji-icon" style="background: linear-gradient(135deg, #e8f5e9, #dcedc8);">🏔️</div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <p style="font-weight: 600; font-size: 14px; color: #1a1a2e;">REI</p>
+              <p style="font-weight: 700; font-size: 18px; color: #1a1a2e; font-family: 'Cormorant Garamond', serif;">$50.00</p>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 7%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Transactions -->
+      <p class="section-label" style="margin-top: 6px;">Recent Transactions</p>
+      <div class="glass-card">
+        <div class="tx-item">
+          <div class="emoji-icon-sm emoji-icon" style="background: rgba(74, 222, 128, 0.1);">↓</div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <p style="font-weight: 500; font-size: 13px; color: #1a1a2e;">Added to Amazon</p>
+              <p style="font-weight: 600; font-size: 13px; color: #3a9a6a;">+$200.00</p>
+            </div>
+            <p class="small">Mar 8, 2026</p>
+          </div>
+        </div>
+        <div class="tx-item">
+          <div class="emoji-icon-sm emoji-icon" style="background: rgba(220, 100, 100, 0.08);">↑</div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <p style="font-weight: 500; font-size: 13px; color: #1a1a2e;">Nike — Air Max 90</p>
+              <p style="font-weight: 600; font-size: 13px; color: #c45a5a;">-$139.99</p>
+            </div>
+            <p class="small">Feb 28, 2026</p>
+          </div>
+        </div>
+        <div class="tx-item">
+          <div class="emoji-icon-sm emoji-icon" style="background: rgba(74, 222, 128, 0.1);">↓</div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <p style="font-weight: 500; font-size: 13px; color: #1a1a2e;">Added to Nike</p>
+              <p style="font-weight: 600; font-size: 13px; color: #3a9a6a;">+$150.00</p>
+            </div>
+            <p class="small">Feb 25, 2026</p>
+          </div>
+        </div>
+        <div class="tx-item">
+          <div class="emoji-icon-sm emoji-icon" style="background: rgba(220, 100, 100, 0.08);">↑</div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <p style="font-weight: 500; font-size: 13px; color: #1a1a2e;">Apple — MagSafe Case</p>
+              <p style="font-weight: 600; font-size: 13px; color: #c45a5a;">-$59.00</p>
+            </div>
+            <p class="small">Feb 20, 2026</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="height: 20px;"></div>
+    </div>
+
+  </div><!-- end screen-container -->
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="navTo('screen-home', this)">
+      <div class="nav-icon-wrap"><span class="nav-icon">🏠</span></div>
+      <span>Home</span>
+    </button>
+    <button class="nav-item" onclick="navTo('screen-cart', this)">
+      <div class="nav-icon-wrap">
+        <span class="nav-icon">🛒</span>
+        <div class="nav-badge">2</div>
+      </div>
+      <span>Carts</span>
+    </button>
+    <button class="nav-item" onclick="navTo('screen-inbox', this)">
+      <div class="nav-icon-wrap">
+        <span class="nav-icon">📬</span>
+        <div class="nav-badge">3</div>
+      </div>
+      <span>Inbox</span>
+    </button>
+    <button class="nav-item" onclick="navTo('screen-wallet', this)">
+      <div class="nav-icon-wrap"><span class="nav-icon">💰</span></div>
+      <span>Wallet</span>
+    </button>
+  </div>
+
+  <!-- Home Indicator -->
+  <div class="home-indicator"></div>
+</div>
+
+<script>
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+
+  // Update nav highlight
+  const navMap = {
+    'screen-home': 0,
+    'screen-cart': 1,
+    'screen-inbox': 2,
+    'screen-wallet': 3,
+    'screen-nike': -1
+  };
+  const idx = navMap[id];
+  if (idx >= 0) {
+    document.querySelectorAll('.nav-item').forEach((n, i) => {
+      n.classList.toggle('active', i === idx);
+    });
+  }
+
+  // Scroll to top
+  document.querySelector('.screen-container').scrollTop = 0;
+}
+
+function navTo(id, el) {
+  showScreen(id);
+}
+
+function switchTab(tabEl, contentId) {
+  // Update tab buttons
+  tabEl.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+
+  // Update tab content
+  const screen = tabEl.closest('.screen');
+  screen.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+  document.getElementById(contentId).style.display = 'block';
+}
+</script>
+</body>
+</html>

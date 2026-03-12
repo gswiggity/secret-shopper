@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secret Shopper — v4 (Better Call Saul)</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --amber: #d4a04a;
+  --amber-light: #e8c47a;
+  --teal: #1a535c;
+  --teal-dark: #12393f;
+  --cream: #f5e6c8;
+  --cream-dark: #e8d4aa;
+  --sienna: #c0654a;
+  --sienna-light: #d4826a;
+  --charcoal: #2a2a2a;
+  --charcoal-light: #3d3d3d;
+  --legal-yellow: #fff8dc;
+  --legal-lines: #c8dce0;
+  --evidence-bg: #faf3e6;
+  --card-border: #b89a5a;
+  --text-primary: #1a1a1a;
+  --text-secondary: #5a5a5a;
+  --text-muted: #8a7a6a;
+  --success: #3a8a5c;
+  --warning: #c0654a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Space Mono', monospace;
+  background: #1a1a1a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* iPhone Frame */
+.iphone-frame {
+  width: 393px;
+  height: 852px;
+  background: var(--charcoal);
+  border-radius: 50px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 3px #1a1a1a,
+    0 0 0 6px #3d3d3d,
+    0 20px 60px rgba(0,0,0,0.6),
+    inset 0 0 4px rgba(212,160,74,0.1);
+}
+
+/* Dynamic Island */
+.dynamic-island {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 126px;
+  height: 36px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 100;
+}
+
+/* Status Bar */
+.status-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 54px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 28px 8px;
+  z-index: 90;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: -apple-system, sans-serif;
+}
+.status-bar .time { font-size: 16px; font-weight: 700; }
+.status-bar .icons { display: flex; gap: 5px; align-items: center; font-size: 12px; }
+
+/* Screen Container */
+.screen-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: none;
+  flex-direction: column;
+  background: var(--cream);
+  transition: opacity 0.2s;
+}
+.screen.active { display: flex; }
+
+.screen-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 60px 0 90px;
+  -webkit-overflow-scrolling: touch;
+}
+.screen-content::-webkit-scrollbar { display: none; }
+
+/* Pinstripe Background Pattern */
+.pinstripe-bg {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 23px,
+      var(--legal-lines) 23px,
+      var(--legal-lines) 24px
+    );
+  background-color: var(--cream);
+}
+
+/* Bottom Nav */
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 88px;
+  background: var(--charcoal);
+  border-top: 2px solid var(--amber);
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding-top: 8px;
+  z-index: 80;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border: none;
+  background: none;
+  transition: all 0.2s;
+}
+.nav-item svg { width: 24px; height: 24px; fill: #7a7a7a; transition: fill 0.2s; }
+.nav-item span { font-family: 'Space Mono', monospace; font-size: 10px; color: #7a7a7a; transition: color 0.2s; }
+.nav-item.active svg { fill: var(--amber); }
+.nav-item.active span { color: var(--amber); }
+.nav-item:hover svg { fill: var(--amber-light); }
+.nav-item:hover span { color: var(--amber-light); }
+
+.nav-badge {
+  position: absolute;
+  top: 0;
+  right: 2px;
+  background: var(--sienna);
+  color: white;
+  font-size: 9px;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Home Indicator */
+.home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  background: #5a5a5a;
+  border-radius: 3px;
+  z-index: 90;
+}
+
+/* Typography */
+h1, h2, h3 { font-family: 'Libre Baskerville', serif; color: var(--charcoal); }
+h1 { font-size: 22px; font-weight: 700; }
+h2 { font-size: 16px; font-weight: 700; }
+h3 { font-size: 14px; font-weight: 700; }
+
+/* Shared Components */
+.section-pad { padding: 0 20px; }
+.section-gap { margin-top: 24px; }
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+  padding: 0 20px;
+}
+.section-header h2 { font-family: 'Libre Baskerville', serif; font-size: 15px; }
+.section-header .see-all {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--teal);
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid var(--teal);
+  padding: 2px 8px;
+  border-radius: 2px;
+}
+
+/* Cards — evidence folder style */
+.card {
+  background: var(--evidence-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 4px;
+  padding: 14px;
+  margin: 0 20px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--amber);
+}
+.card:hover { border-color: var(--amber); transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
+.card:active { transform: translateY(0); }
+
+/* Stamp badge */
+.stamp {
+  display: inline-block;
+  font-family: 'Libre Baskerville', serif;
+  font-weight: 700;
+  font-size: 10px;
+  text-transform: uppercase;
+  border: 2px solid;
+  padding: 2px 8px;
+  border-radius: 2px;
+  transform: rotate(-2deg);
+  letter-spacing: 1px;
+}
+.stamp-teal { color: var(--teal); border-color: var(--teal); }
+.stamp-sienna { color: var(--sienna); border-color: var(--sienna); }
+.stamp-amber { color: var(--amber); border-color: var(--amber); }
+.stamp-success { color: var(--success); border-color: var(--success); }
+
+/* Back button */
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--teal);
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 6px 20px;
+  margin-top: 6px;
+}
+.back-btn svg { width: 16px; height: 16px; fill: var(--teal); }
+.back-btn:hover { color: var(--teal-dark); }
+
+/* Progress bar */
+.progress-track {
+  width: 100%;
+  height: 6px;
+  background: var(--cream-dark);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+.fill-amber { background: var(--amber); }
+.fill-teal { background: var(--teal); }
+.fill-sienna { background: var(--sienna); }
+
+/* ============== SCREEN 1: DASHBOARD ============== */
+.dash-greeting {
+  padding: 16px 20px 4px;
+}
+.dash-greeting .pre {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+.dash-greeting h1 {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 24px;
+  color: var(--charcoal);
+  margin-top: 2px;
+}
+.dash-greeting .sub {
+  font-size: 12px;
+  color: var(--teal);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* Tracking Hero */
+.tracking-hero {
+  margin: 16px 20px 0;
+  background: var(--teal-dark);
+  border: 2px solid var(--amber);
+  border-radius: 6px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.tracking-hero::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(212,160,74,0.05));
+  pointer-events: none;
+}
+.tracking-hero .hero-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 13px;
+  color: var(--amber);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tracking-hero .hero-title svg { width: 16px; height: 16px; fill: var(--amber); }
+
+.track-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(212,160,74,0.2);
+}
+.track-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+
+.track-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  background: rgba(212,160,74,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  border: 1px solid var(--amber);
+}
+.track-info { flex: 1; }
+.track-info .brand { font-size: 13px; font-weight: 700; color: #fff; }
+.track-info .status { font-size: 11px; color: var(--amber-light); margin-top: 2px; }
+.track-info .eta { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+.track-info .progress-track { margin-top: 6px; background: rgba(255,255,255,0.1); border-color: rgba(212,160,74,0.3); }
+
+/* Brand Row */
+.brand-scroll-wrap {
+  overflow-x: auto;
+  padding: 0 20px;
+  -webkit-overflow-scrolling: touch;
+}
+.brand-scroll-wrap::-webkit-scrollbar { display: none; }
+.brand-row {
+  display: flex;
+  gap: 10px;
+  padding: 2px 0;
+  width: max-content;
+}
+.brand-stamp {
+  width: 72px;
+  height: 72px;
+  border: 2px solid var(--card-border);
+  border-radius: 4px;
+  background: var(--evidence-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.brand-stamp::after {
+  content: 'CASE FILE';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 5px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  font-family: 'Space Mono', monospace;
+}
+.brand-stamp:hover { border-color: var(--amber); transform: rotate(-1deg); }
+.brand-stamp .b-icon { font-size: 20px; }
+.brand-stamp .b-name { font-size: 9px; font-weight: 700; color: var(--charcoal); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Deals / Exhibits */
+.exhibit-row {
+  display: flex;
+  gap: 8px;
+  padding: 0 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.exhibit-row::-webkit-scrollbar { display: none; }
+.exhibit {
+  flex-shrink: 0;
+  width: 110px;
+  background: var(--evidence-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 4px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.exhibit::before {
+  content: 'EXHIBIT';
+  display: block;
+  font-size: 8px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--cream-dark);
+  padding-bottom: 4px;
+}
+.exhibit:hover { border-color: var(--amber); }
+.exhibit .ex-brand { font-size: 12px; font-weight: 700; color: var(--charcoal); }
+.exhibit .ex-deal {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--sienna);
+  margin: 4px 0;
+}
+.exhibit .ex-label { font-size: 9px; color: var(--text-muted); }
+
+/* Abandoned Carts */
+.abandoned-card {
+  background: var(--evidence-bg);
+  border: 2px solid var(--sienna);
+  border-left: 5px solid var(--sienna);
+  border-radius: 4px;
+  padding: 14px;
+  margin: 0 20px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.abandoned-card:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
+.abandoned-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.abandoned-top .ab-brand { font-weight: 700; font-size: 13px; color: var(--charcoal); }
+.abandoned-top .ab-price { font-family: 'Libre Baskerville', serif; font-weight: 700; font-size: 16px; color: var(--sienna); }
+.abandoned-nudge {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--teal);
+  font-style: italic;
+  padding: 6px 8px;
+  background: rgba(26,83,92,0.06);
+  border-radius: 2px;
+  border-left: 2px solid var(--teal);
+}
+.abandoned-nudge::before { content: 'AI COUNSEL: '; font-weight: 700; font-style: normal; }
+
+/* Wishlist */
+.wishlist-card {
+  background: var(--evidence-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 4px;
+  padding: 14px;
+  margin: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.wishlist-card:hover { border-color: var(--amber); }
+.wishlist-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(212,160,74,0.15);
+  border: 1px solid var(--amber);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.wishlist-info .wl-name { font-weight: 700; font-size: 13px; color: var(--charcoal); }
+.wishlist-info .wl-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* ============== SCREEN 2: CART DETAIL ============== */
+.cart-header-bar {
+  padding: 6px 20px 12px;
+  border-bottom: 2px solid var(--card-border);
+  margin-bottom: 16px;
+  background: rgba(212,160,74,0.06);
+}
+.cart-header-bar h1 { font-size: 20px; }
+.cart-header-bar .cart-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.cart-header-bar .cart-meta span { color: var(--sienna); font-weight: 700; }
+
+.cart-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--cream-dark);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cart-item:hover { background: rgba(212,160,74,0.05); }
+.cart-item-img {
+  width: 56px;
+  height: 56px;
+  background: var(--cream-dark);
+  border: 1px solid var(--card-border);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.cart-item-info { flex: 1; }
+.cart-item-info .ci-name { font-size: 12px; font-weight: 700; color: var(--charcoal); line-height: 1.3; }
+.cart-item-info .ci-prices { margin-top: 4px; display: flex; align-items: baseline; gap: 8px; }
+.cart-item-info .ci-price { font-family: 'Libre Baskerville', serif; font-weight: 700; font-size: 15px; color: var(--charcoal); }
+.cart-item-info .ci-original { font-size: 12px; color: var(--text-muted); text-decoration: line-through; }
+.cart-item-info .ci-savings { font-size: 10px; color: var(--success); font-weight: 700; }
+
+/* Price History Chart */
+.chart-card {
+  margin: 16px 20px;
+  background: var(--evidence-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 4px;
+  padding: 16px;
+}
+.chart-card h3 { margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.chart-card h3 svg { width: 14px; height: 14px; fill: var(--teal); }
+.chart-svg { width: 100%; }
+
+/* AI Prediction */
+.ai-brief {
+  margin: 0 20px;
+  background: var(--teal-dark);
+  border: 2px solid var(--amber);
+  border-radius: 4px;
+  padding: 16px;
+  position: relative;
+}
+.ai-brief::before {
+  content: 'LEGAL BRIEF — AI ANALYSIS';
+  display: block;
+  font-size: 9px;
+  color: var(--amber);
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(212,160,74,0.3);
+}
+.ai-brief .verdict { font-family: 'Libre Baskerville', serif; font-size: 18px; color: #fff; font-weight: 700; }
+.ai-brief .confidence {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--amber-light);
+}
+.ai-brief .reasoning {
+  margin-top: 8px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.5;
+}
+
+/* Approve Button */
+.approve-btn {
+  display: block;
+  width: calc(100% - 40px);
+  margin: 20px 20px;
+  padding: 16px;
+  background: var(--amber);
+  border: 2px solid var(--charcoal);
+  border-radius: 4px;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--charcoal);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 3px 3px 0 var(--charcoal);
+}
+.approve-btn:hover { background: var(--amber-light); transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--charcoal); }
+.approve-btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--charcoal); }
+.approve-btn .btn-sub { display: block; font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 400; margin-top: 4px; letter-spacing: 0; text-transform: none; color: var(--charcoal-light); }
+
+/* ============== SCREEN 3: RETAILER PROFILE ============== */
+.retailer-hero {
+  background: var(--teal-dark);
+  padding: 16px 20px 20px;
+  border-bottom: 3px solid var(--amber);
+  position: relative;
+}
+.retailer-hero .rh-top { display: flex; align-items: center; gap: 14px; }
+.retailer-logo {
+  width: 56px;
+  height: 56px;
+  background: rgba(255,255,255,0.1);
+  border: 2px solid var(--amber);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+.retailer-hero .rh-name { font-family: 'Libre Baskerville', serif; font-size: 22px; color: #fff; }
+.retailer-hero .rh-alias { font-size: 11px; color: var(--amber-light); margin-top: 2px; }
+
+.shield-ruling {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.shield-grade {
+  width: 52px;
+  height: 52px;
+  border: 3px solid var(--amber);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--amber);
+  background: rgba(212,160,74,0.1);
+  transform: rotate(-3deg);
+}
+.shield-label { font-size: 11px; color: rgba(255,255,255,0.7); }
+.shield-label strong { color: var(--amber); font-size: 13px; }
+
+/* Shield Breakdown */
+.shield-breakdown {
+  margin: 16px 20px;
+  background: var(--evidence-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 4px;
+  padding: 14px;
+}
+.shield-breakdown h3 { margin-bottom: 10px; font-size: 13px; }
+.sb-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--cream-dark);
+  font-size: 12px;
+}
+.sb-row:last-child { border-bottom: none; }
+.sb-row .sb-label { color: var(--text-secondary); }
+.sb-row .sb-val { font-weight: 700; color: var(--charcoal); }
+.sb-bar-wrap { width: 80px; }
+
+/* Retailer Stats */
+.retailer-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 20px;
+  margin-top: 16px;
+}
+.r-stat {
+  background: var(--evidence-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 4px;
+  padding: 14px;
+  text-align: center;
+}
+.r-stat .rs-val { font-family: 'Libre Baskerville', serif; font-size: 22px; font-weight: 700; color: var(--charcoal); }
+.r-stat .rs-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+/* Return Windows */
+.return-card {
+  margin: 16px 20px 0;
+  background: var(--evidence-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 4px;
+  padding: 14px;
+}
+.return-card h3 { margin-bottom: 10px; font-size: 13px; }
+.return-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--cream-dark);
+  font-size: 12px;
+}
+.return-item:last-child { border-bottom: none; }
+.return-item .ri-name { color: var(--text-secondary); }
+.return-item .ri-days { font-weight: 700; }
+.ri-urgent { color: var(--sienna); }
+.ri-ok { color: var(--success); }
+
+/* Order History */
+.order-history {
+  margin: 16px 20px;
+  background: var(--evidence-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 4px;
+  padding: 14px;
+}
+.order-history h3 { margin-bottom: 10px; font-size: 13px; }
+.oh-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--cream-dark);
+  font-size: 12px;
+}
+.oh-item:last-child { border-bottom: none; }
+.oh-item .oh-name { color: var(--charcoal); font-weight: 700; }
+.oh-item .oh-date { color: var(--text-muted); font-size: 10px; }
+.oh-item .oh-price { font-weight: 700; color: var(--charcoal); }
+
+/* ============== SCREEN 4: INBOX ============== */
+.inbox-tabs {
+  display: flex;
+  gap: 0;
+  padding: 8px 20px 0;
+  border-bottom: 2px solid var(--card-border);
+}
+.inbox-tab {
+  padding: 10px 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  border: none;
+  background: none;
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: color 0.2s;
+}
+.inbox-tab.active { color: var(--teal); }
+.inbox-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--teal);
+}
+.inbox-tab .tab-badge {
+  font-size: 9px;
+  background: var(--sienna);
+  color: white;
+  padding: 1px 5px;
+  border-radius: 8px;
+  margin-left: 4px;
+}
+
+.inbox-panel { display: none; }
+.inbox-panel.active { display: block; }
+
+.inbox-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--cream-dark);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.inbox-item:hover { background: rgba(212,160,74,0.05); }
+.inbox-item.unread { background: rgba(26,83,92,0.04); }
+.inbox-item.unread .ii-subject { font-weight: 700; }
+
+.ii-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  border: 1px solid;
+}
+.ii-icon-track { background: rgba(26,83,92,0.1); border-color: var(--teal); }
+.ii-icon-promo { background: rgba(212,160,74,0.1); border-color: var(--amber); }
+.ii-icon-blocked { background: rgba(192,101,74,0.1); border-color: var(--sienna); }
+
+.ii-content { flex: 1; min-width: 0; }
+.ii-subject { font-size: 12px; color: var(--charcoal); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ii-preview { font-size: 11px; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ii-time { font-size: 10px; color: var(--text-muted); flex-shrink: 0; }
+
+.blocked-banner {
+  margin: 16px 20px;
+  background: rgba(192,101,74,0.08);
+  border: 2px solid var(--sienna);
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+}
+.blocked-banner .bb-count {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--sienna);
+}
+.blocked-banner .bb-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+.blocked-banner .bb-stamp {
+  display: inline-block;
+  margin-top: 10px;
+  font-family: 'Libre Baskerville', serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--sienna);
+  border: 3px solid var(--sienna);
+  padding: 4px 16px;
+  transform: rotate(-3deg);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+/* ============== SCREEN 5: WALLET ============== */
+.wallet-hero {
+  background: var(--teal-dark);
+  padding: 20px;
+  margin: 0;
+  border-bottom: 3px solid var(--amber);
+  text-align: center;
+}
+.wallet-hero .wh-label {
+  font-size: 10px;
+  color: var(--amber-light);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+.wallet-hero .wh-amount {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 42px;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 4px;
+}
+.wallet-hero .wh-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+.wallet-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--cream-dark);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.wallet-card:hover { background: rgba(212,160,74,0.05); }
+.wc-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 4px;
+  border: 2px solid var(--card-border);
+  background: var(--evidence-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.wc-info { flex: 1; }
+.wc-info .wc-name { font-weight: 700; font-size: 13px; color: var(--charcoal); }
+.wc-info .wc-detail { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.wc-amount { font-family: 'Libre Baskerville', serif; font-weight: 700; font-size: 16px; color: var(--charcoal); }
+
+.tx-section { margin-top: 24px; }
+.tx-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--cream-dark);
+  font-size: 12px;
+}
+.tx-item .tx-desc { color: var(--charcoal); }
+.tx-item .tx-date { font-size: 10px; color: var(--text-muted); }
+.tx-item .tx-amount { font-weight: 700; }
+.tx-credit { color: var(--success); }
+.tx-debit { color: var(--sienna); }
+
+</style>
+</head>
+<body>
+
+<div class="iphone-frame">
+  <div class="dynamic-island"></div>
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <span class="icons">
+      <svg width="16" height="12" viewBox="0 0 16 12"><rect x="0" y="3" width="3" height="9" rx="0.5" fill="currentColor"/><rect x="4.5" y="2" width="3" height="10" rx="0.5" fill="currentColor"/><rect x="9" y="1" width="3" height="11" rx="0.5" fill="currentColor"/><rect x="13.5" y="0" width="3" height="12" rx="0.5" fill="currentColor"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 2.4C5.6 2.4 3.4 3.4 1.8 5l1.4 1.4C4.4 5.2 6.1 4.4 8 4.4s3.6.8 4.8 2l1.4-1.4C12.6 3.4 10.4 2.4 8 2.4z" fill="currentColor"/><path d="M8 6.4c-1.4 0-2.6.6-3.4 1.4L6 9.2c.5-.5 1.2-.8 2-.8s1.5.3 2 .8l1.4-1.4C10.6 7 9.4 6.4 8 6.4z" fill="currentColor"/><circle cx="8" cy="11" r="1.2" fill="currentColor"/></svg>
+      <svg width="28" height="13" viewBox="0 0 28 13"><rect x="0" y="1" width="24" height="11" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="25" y="4" width="2" height="5" rx="0.5" fill="currentColor"/><rect x="1.5" y="2.5" width="18" height="8" rx="1" fill="#3a3"/></svg>
+    </span>
+  </div>
+
+  <div class="screen-container">
+
+    <!-- ==================== SCREEN 1: DASHBOARD ==================== -->
+    <div class="screen active pinstripe-bg" id="screen-home">
+      <div class="screen-content">
+        <div class="dash-greeting">
+          <span class="pre">Tuesday Evening</span>
+          <h1>Good evening, Counselor.</h1>
+          <div class="sub">"Let's review the evidence."</div>
+        </div>
+
+        <!-- Tracking Hero -->
+        <div class="tracking-hero">
+          <div class="hero-title">
+            <svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zM18 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            Active Cases — 3 Shipments
+          </div>
+
+          <div class="track-item" onclick="showScreen('screen-nike')">
+            <div class="track-icon">👟</div>
+            <div class="track-info">
+              <div class="brand">Nike — Air Max 90</div>
+              <div class="status">Out for delivery — Philadelphia, PA</div>
+              <div class="progress-track"><div class="progress-fill fill-amber" style="width:90%"></div></div>
+              <div class="eta">ETA: Today by 8pm</div>
+            </div>
+          </div>
+
+          <div class="track-item">
+            <div class="track-icon">🍎</div>
+            <div class="track-info">
+              <div class="brand">Apple — AirPods Pro</div>
+              <div class="status">In transit — Memphis, TN</div>
+              <div class="progress-track"><div class="progress-fill fill-teal" style="width:55%"></div></div>
+              <div class="eta">ETA: Mar 13</div>
+            </div>
+          </div>
+
+          <div class="track-item">
+            <div class="track-icon">🌸</div>
+            <div class="track-info">
+              <div class="brand">Glossier — Cloud Paint Set</div>
+              <div class="status">Label created — Awaiting pickup</div>
+              <div class="progress-track"><div class="progress-fill fill-sienna" style="width:15%"></div></div>
+              <div class="eta">ETA: Mar 16</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Brand Row -->
+        <div class="section-gap">
+          <div class="section-header">
+            <h2>Your Retainers</h2>
+            <a class="see-all">ALL FILES</a>
+          </div>
+          <div class="brand-scroll-wrap">
+            <div class="brand-row">
+              <div class="brand-stamp" onclick="showScreen('screen-nike')"><span class="b-icon">👟</span><span class="b-name">Nike</span></div>
+              <div class="brand-stamp"><span class="b-icon">🍎</span><span class="b-name">Apple</span></div>
+              <div class="brand-stamp" onclick="showScreen('screen-cart')"><span class="b-icon">📦</span><span class="b-name">Amazon</span></div>
+              <div class="brand-stamp"><span class="b-icon">🌸</span><span class="b-name">Glossier</span></div>
+              <div class="brand-stamp"><span class="b-icon">🏔️</span><span class="b-name">REI</span></div>
+              <div class="brand-stamp"><span class="b-icon">🧥</span><span class="b-name">Patagon.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deals / Exhibits -->
+        <div class="section-gap">
+          <div class="section-header">
+            <h2>Exhibits — Active Deals</h2>
+          </div>
+          <div class="exhibit-row">
+            <div class="exhibit">
+              <span class="ex-brand">Amazon</span>
+              <span class="ex-deal">-32%</span>
+              <span class="ex-label">Electronics</span>
+            </div>
+            <div class="exhibit">
+              <span class="ex-brand">Nike</span>
+              <span class="ex-deal">25%</span>
+              <span class="ex-label">Footwear</span>
+            </div>
+            <div class="exhibit">
+              <span class="ex-brand">REI</span>
+              <span class="ex-deal">20%</span>
+              <span class="ex-label">Gear Sale</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Abandoned Carts -->
+        <div class="section-gap">
+          <div class="section-header">
+            <h2>Cold Cases</h2>
+            <a class="see-all">REVIEW</a>
+          </div>
+          <div class="abandoned-card" onclick="showScreen('screen-cart')">
+            <div class="abandoned-top">
+              <div>
+                <div class="ab-brand">Amazon</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px">3 items — 4 days idle</div>
+              </div>
+              <div class="ab-price">$247.83</div>
+            </div>
+            <div class="abandoned-nudge">Sony headphones hit lowest price in 90 days. Move on it.</div>
+          </div>
+          <div class="abandoned-card">
+            <div class="abandoned-top">
+              <div>
+                <div class="ab-brand">REI</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px">1 item — 12 days idle</div>
+              </div>
+              <div class="ab-price">$134.99</div>
+            </div>
+            <div class="abandoned-nudge">Member sale ends Friday. Your 20% coupon expires with it.</div>
+          </div>
+        </div>
+
+        <!-- Shared Wishlists -->
+        <div class="section-gap" style="margin-bottom:20px">
+          <div class="section-header">
+            <h2>Open Discovery</h2>
+          </div>
+          <div class="wishlist-card">
+            <div class="wishlist-icon">🎁</div>
+            <div class="wishlist-info">
+              <div class="wl-name">Birthday Picks 2026</div>
+              <div class="wl-meta">Shared with 3 people &middot; 8 items &middot; $342 total</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 2: CART DETAIL ==================== -->
+    <div class="screen pinstripe-bg" id="screen-cart">
+      <div class="screen-content">
+        <button class="back-btn" onclick="showScreen('screen-home')">
+          <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          Back to Docket
+        </button>
+
+        <div class="cart-header-bar">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:28px">📦</span>
+            <div>
+              <h1>Amazon Cart</h1>
+              <div class="cart-meta">Case #AMZ-2026-0311 &middot; <span>3 items pending</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cart-item">
+          <div class="cart-item-img">🎧</div>
+          <div class="cart-item-info">
+            <div class="ci-name">Sony WH-1000XM5 Wireless Headphones</div>
+            <div class="ci-prices">
+              <span class="ci-price">$328.00</span>
+              <span class="ci-original">$399.99</span>
+              <span class="ci-savings">SAVE $71.99</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cart-item">
+          <div class="cart-item-img">🔌</div>
+          <div class="cart-item-info">
+            <div class="ci-name">Anker USB-C Hub, 7-in-1 Adapter</div>
+            <div class="ci-prices">
+              <span class="ci-price">$34.99</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cart-item">
+          <div class="cart-item-img">📖</div>
+          <div class="cart-item-info">
+            <div class="ci-name">Designing Data-Intensive Applications</div>
+            <div class="ci-prices">
+              <span class="ci-price">$33.36</span>
+              <span class="ci-original">$44.99</span>
+              <span class="ci-savings">SAVE $11.63</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Price History -->
+        <div class="chart-card">
+          <h3>
+            <svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+            Price History — Sony WH-1000XM5
+          </h3>
+          <svg class="chart-svg" viewBox="0 0 300 100" preserveAspectRatio="none">
+            <!-- Grid lines -->
+            <line x1="0" y1="25" x2="300" y2="25" stroke="#e8d4aa" stroke-width="0.5" stroke-dasharray="4"/>
+            <line x1="0" y1="50" x2="300" y2="50" stroke="#e8d4aa" stroke-width="0.5" stroke-dasharray="4"/>
+            <line x1="0" y1="75" x2="300" y2="75" stroke="#e8d4aa" stroke-width="0.5" stroke-dasharray="4"/>
+            <!-- Price labels -->
+            <text x="2" y="23" fill="#8a7a6a" font-size="7" font-family="Space Mono">$400</text>
+            <text x="2" y="48" fill="#8a7a6a" font-size="7" font-family="Space Mono">$360</text>
+            <text x="2" y="73" fill="#8a7a6a" font-size="7" font-family="Space Mono">$320</text>
+            <!-- Area fill -->
+            <path d="M30,20 L70,25 L110,45 L150,35 L190,55 L230,40 L270,75 L270,95 L30,95 Z" fill="rgba(26,83,92,0.1)" stroke="none"/>
+            <!-- Line -->
+            <polyline points="30,20 70,25 110,45 150,35 190,55 230,40 270,75" fill="none" stroke="#1a535c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Current price dot -->
+            <circle cx="270" cy="75" r="5" fill="#c0654a" stroke="#fff" stroke-width="2"/>
+            <text x="248" y="90" fill="#c0654a" font-size="8" font-weight="bold" font-family="Space Mono">$328</text>
+            <!-- Peak label -->
+            <text x="18" y="16" fill="#8a7a6a" font-size="7" font-family="Space Mono">$399</text>
+            <!-- Month labels -->
+            <text x="30" y="98" fill="#8a7a6a" font-size="6" font-family="Space Mono">Oct</text>
+            <text x="110" y="98" fill="#8a7a6a" font-size="6" font-family="Space Mono">Dec</text>
+            <text x="190" y="98" fill="#8a7a6a" font-size="6" font-family="Space Mono">Feb</text>
+            <text x="260" y="98" fill="#8a7a6a" font-size="6" font-family="Space Mono">Now</text>
+          </svg>
+        </div>
+
+        <!-- AI Prediction -->
+        <div class="ai-brief">
+          <div class="verdict">"Wait 2 More Days."</div>
+          <div class="confidence">
+            <span class="stamp stamp-amber" style="transform:none; font-family:'Space Mono',monospace; font-size:10px">78% CONFIDENCE</span>
+          </div>
+          <div class="reasoning">
+            Based on historical data, Amazon tends to run flash deals on audio equipment mid-week. A further $18-$25 drop is probable. The evidence is compelling — I advise patience, Counselor.
+          </div>
+        </div>
+
+        <button class="approve-btn" onclick="alert('Order approved! The verdict is in.')">
+          Approve Purchase — $247.83
+          <span class="btn-sub">Sign the verdict. Final sale.</span>
+        </button>
+
+        <div style="height:20px"></div>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 3: NIKE RETAILER PROFILE ==================== -->
+    <div class="screen" id="screen-nike" style="background:var(--cream)">
+      <div class="screen-content" style="padding-top:54px">
+        <button class="back-btn" onclick="showScreen('screen-home')" style="position:relative;z-index:2">
+          <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="var(--amber)"/></svg>
+          <span style="color:var(--amber)">Back to Docket</span>
+        </button>
+
+        <div class="retailer-hero">
+          <div class="rh-top">
+            <div class="retailer-logo">👟</div>
+            <div>
+              <div class="rh-name">Nike</div>
+              <div class="rh-alias">nike.gabi@secretshopper.mail</div>
+            </div>
+          </div>
+          <div class="shield-ruling">
+            <div class="shield-grade">A-</div>
+            <div>
+              <div class="shield-label"><strong>Shield Score: Excellent</strong></div>
+              <div class="shield-label">Court ruling: Trustworthy retailer</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="shield-breakdown">
+          <h3>Shield Breakdown — Case Evidence</h3>
+          <div class="sb-row">
+            <span class="sb-label">Price Honesty</span>
+            <div class="sb-bar-wrap"><div class="progress-track"><div class="progress-fill fill-teal" style="width:88%"></div></div></div>
+            <span class="sb-val">88%</span>
+          </div>
+          <div class="sb-row">
+            <span class="sb-label">Return Policy</span>
+            <div class="sb-bar-wrap"><div class="progress-track"><div class="progress-fill fill-amber" style="width:92%"></div></div></div>
+            <span class="sb-val">92%</span>
+          </div>
+          <div class="sb-row">
+            <span class="sb-label">Data Privacy</span>
+            <div class="sb-bar-wrap"><div class="progress-track"><div class="progress-fill fill-teal" style="width:75%"></div></div></div>
+            <span class="sb-val">75%</span>
+          </div>
+          <div class="sb-row">
+            <span class="sb-label">Shipping Speed</span>
+            <div class="sb-bar-wrap"><div class="progress-track"><div class="progress-fill fill-amber" style="width:95%"></div></div></div>
+            <span class="sb-val">95%</span>
+          </div>
+        </div>
+
+        <div class="retailer-stat-grid">
+          <div class="r-stat">
+            <div class="rs-val">$150</div>
+            <div class="rs-label">Wallet Balance</div>
+          </div>
+          <div class="r-stat">
+            <div class="rs-val">14</div>
+            <div class="rs-label">Lifetime Orders</div>
+          </div>
+        </div>
+
+        <div class="return-card">
+          <h3>Active Return Windows</h3>
+          <div class="return-item">
+            <span class="ri-name">Air Max 90 — Bone/Sail</span>
+            <span class="ri-days ri-urgent">4 days left</span>
+          </div>
+          <div class="return-item">
+            <span class="ri-name">Dri-FIT Running Shorts</span>
+            <span class="ri-days ri-ok">22 days left</span>
+          </div>
+        </div>
+
+        <div class="order-history">
+          <h3>Order History — Recent</h3>
+          <div class="oh-item">
+            <div>
+              <div class="oh-name">Air Max 90</div>
+              <div class="oh-date">Feb 28, 2026</div>
+            </div>
+            <div class="oh-price">$129.99</div>
+          </div>
+          <div class="oh-item">
+            <div>
+              <div class="oh-name">Dri-FIT Shorts (2x)</div>
+              <div class="oh-date">Feb 14, 2026</div>
+            </div>
+            <div class="oh-price">$72.00</div>
+          </div>
+          <div class="oh-item">
+            <div>
+              <div class="oh-name">Pegasus 41</div>
+              <div class="oh-date">Jan 20, 2026</div>
+            </div>
+            <div class="oh-price">$139.99</div>
+          </div>
+        </div>
+
+        <div style="height:20px"></div>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 4: INBOX ==================== -->
+    <div class="screen pinstripe-bg" id="screen-inbox">
+      <div class="screen-content">
+        <div class="section-pad" style="padding-top:10px">
+          <h1>The Docket</h1>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px">All correspondence, filed & sorted.</div>
+        </div>
+
+        <div class="inbox-tabs">
+          <button class="inbox-tab active" onclick="switchTab('tracking')">Tracking<span class="tab-badge">3</span></button>
+          <button class="inbox-tab" onclick="switchTab('promos')">Promos<span class="tab-badge">7</span></button>
+          <button class="inbox-tab" onclick="switchTab('blocked')">Blocked</button>
+        </div>
+
+        <!-- Tracking Tab -->
+        <div class="inbox-panel active" id="tab-tracking">
+          <div class="inbox-item unread">
+            <div class="ii-icon ii-icon-track">📦</div>
+            <div class="ii-content">
+              <div class="ii-subject">Nike — Out for Delivery</div>
+              <div class="ii-preview">Your Air Max 90 is on the truck in Philadelphia</div>
+            </div>
+            <div class="ii-time">2h ago</div>
+          </div>
+          <div class="inbox-item unread">
+            <div class="ii-icon ii-icon-track">📦</div>
+            <div class="ii-content">
+              <div class="ii-subject">Apple — Departed Memphis Hub</div>
+              <div class="ii-preview">AirPods Pro are in transit, expected Mar 13</div>
+            </div>
+            <div class="ii-time">5h ago</div>
+          </div>
+          <div class="inbox-item">
+            <div class="ii-icon ii-icon-track">📦</div>
+            <div class="ii-content">
+              <div class="ii-subject">Glossier — Label Created</div>
+              <div class="ii-preview">Shipment label printed, awaiting carrier pickup</div>
+            </div>
+            <div class="ii-time">1d ago</div>
+          </div>
+          <div class="inbox-item">
+            <div class="ii-icon ii-icon-track">✅</div>
+            <div class="ii-content">
+              <div class="ii-subject">REI — Delivered</div>
+              <div class="ii-preview">Trail Runner Pro delivered to front porch</div>
+            </div>
+            <div class="ii-time">3d ago</div>
+          </div>
+        </div>
+
+        <!-- Promos Tab -->
+        <div class="inbox-panel" id="tab-promos">
+          <div class="inbox-item unread">
+            <div class="ii-icon ii-icon-promo">🏷️</div>
+            <div class="ii-content">
+              <div class="ii-subject">Amazon — 32% off Electronics</div>
+              <div class="ii-preview">Spring electronics sale — headphones, tablets, more</div>
+            </div>
+            <div class="ii-time">3h ago</div>
+          </div>
+          <div class="inbox-item unread">
+            <div class="ii-icon ii-icon-promo">🏷️</div>
+            <div class="ii-content">
+              <div class="ii-subject">Nike — Member Early Access</div>
+              <div class="ii-preview">25% off new arrivals for members only</div>
+            </div>
+            <div class="ii-time">6h ago</div>
+          </div>
+          <div class="inbox-item">
+            <div class="ii-icon ii-icon-promo">🏷️</div>
+            <div class="ii-content">
+              <div class="ii-subject">REI — Member Sale This Weekend</div>
+              <div class="ii-preview">Extra 20% off outlet items, ends Friday</div>
+            </div>
+            <div class="ii-time">1d ago</div>
+          </div>
+          <div class="inbox-item">
+            <div class="ii-icon ii-icon-promo">🏷️</div>
+            <div class="ii-content">
+              <div class="ii-subject">Patagonia — Worn Wear Event</div>
+              <div class="ii-preview">Trade in used gear for store credit</div>
+            </div>
+            <div class="ii-time">2d ago</div>
+          </div>
+          <div class="inbox-item">
+            <div class="ii-icon ii-icon-promo">🏷️</div>
+            <div class="ii-content">
+              <div class="ii-subject">Glossier — Friends of Glossier 15%</div>
+              <div class="ii-preview">Share your link for 15% off sitewide</div>
+            </div>
+            <div class="ii-time">3d ago</div>
+          </div>
+        </div>
+
+        <!-- Blocked Tab -->
+        <div class="inbox-panel" id="tab-blocked">
+          <div class="blocked-banner">
+            <div class="bb-count">47</div>
+            <div class="bb-label">Emails Blocked This Month</div>
+            <div class="bb-stamp">Objection Sustained</div>
+          </div>
+
+          <div class="inbox-item">
+            <div class="ii-icon ii-icon-blocked">🚫</div>
+            <div class="ii-content">
+              <div class="ii-subject">Shein — MEGA FLASH SALE!!!</div>
+              <div class="ii-preview">Blocked: Low trust score, aggressive tracking</div>
+            </div>
+            <div class="ii-time">today</div>
+          </div>
+          <div class="inbox-item">
+            <div class="ii-icon ii-icon-blocked">🚫</div>
+            <div class="ii-content">
+              <div class="ii-subject">Temu — You Won't Believe...</div>
+              <div class="ii-preview">Blocked: Deceptive pricing patterns detected</div>
+            </div>
+            <div class="ii-time">today</div>
+          </div>
+          <div class="inbox-item">
+            <div class="ii-icon ii-icon-blocked">🚫</div>
+            <div class="ii-content">
+              <div class="ii-subject">Wish — Clearance Event Inside</div>
+              <div class="ii-preview">Blocked: Counterfeit risk, privacy violation</div>
+            </div>
+            <div class="ii-time">1d ago</div>
+          </div>
+          <div class="inbox-item">
+            <div class="ii-icon ii-icon-blocked">🚫</div>
+            <div class="ii-content">
+              <div class="ii-subject">Unknown Sender — "Congrats!"</div>
+              <div class="ii-preview">Blocked: Phishing attempt, spoofed domain</div>
+            </div>
+            <div class="ii-time">2d ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SCREEN 5: WALLET ==================== -->
+    <div class="screen" id="screen-wallet" style="background:var(--cream)">
+      <div class="screen-content" style="padding-top:54px">
+        <div class="wallet-hero">
+          <div class="wh-label">Total Portfolio</div>
+          <div class="wh-amount">$725.00</div>
+          <div class="wh-sub">Across 4 retailer accounts</div>
+        </div>
+
+        <div class="section-gap">
+          <div class="section-header"><h2>Retainer Accounts</h2></div>
+        </div>
+
+        <div class="wallet-card" onclick="showScreen('screen-nike')">
+          <div class="wc-icon">👟</div>
+          <div class="wc-info">
+            <div class="wc-name">Nike</div>
+            <div class="wc-detail">Gift card + rewards</div>
+          </div>
+          <div class="wc-amount">$150.00</div>
+        </div>
+
+        <div class="wallet-card">
+          <div class="wc-icon">📦</div>
+          <div class="wc-info">
+            <div class="wc-name">Amazon</div>
+            <div class="wc-detail">Gift card balance</div>
+          </div>
+          <div class="wc-amount">$325.00</div>
+        </div>
+
+        <div class="wallet-card">
+          <div class="wc-icon">🏔️</div>
+          <div class="wc-info">
+            <div class="wc-name">REI</div>
+            <div class="wc-detail">Dividend + gift card</div>
+          </div>
+          <div class="wc-amount">$187.50</div>
+        </div>
+
+        <div class="wallet-card">
+          <div class="wc-icon">🌸</div>
+          <div class="wc-info">
+            <div class="wc-name">Glossier</div>
+            <div class="wc-detail">Store credit</div>
+          </div>
+          <div class="wc-amount">$62.50</div>
+        </div>
+
+        <div class="tx-section">
+          <div class="section-header"><h2>Recent Transactions</h2></div>
+
+          <div class="tx-item">
+            <div>
+              <div class="tx-desc">Nike — Air Max 90</div>
+              <div class="tx-date">Feb 28, 2026</div>
+            </div>
+            <div class="tx-amount tx-debit">-$129.99</div>
+          </div>
+          <div class="tx-item">
+            <div>
+              <div class="tx-desc">Amazon — Gift Card Added</div>
+              <div class="tx-date">Feb 25, 2026</div>
+            </div>
+            <div class="tx-amount tx-credit">+$100.00</div>
+          </div>
+          <div class="tx-item">
+            <div>
+              <div class="tx-desc">REI — Dividend Payout</div>
+              <div class="tx-date">Feb 20, 2026</div>
+            </div>
+            <div class="tx-amount tx-credit">+$37.50</div>
+          </div>
+          <div class="tx-item">
+            <div>
+              <div class="tx-desc">Glossier — Refund (Cloud Paint)</div>
+              <div class="tx-date">Feb 18, 2026</div>
+            </div>
+            <div class="tx-amount tx-credit">+$22.00</div>
+          </div>
+          <div class="tx-item">
+            <div>
+              <div class="tx-desc">Nike — Dri-FIT Shorts (2x)</div>
+              <div class="tx-date">Feb 14, 2026</div>
+            </div>
+            <div class="tx-amount tx-debit">-$72.00</div>
+          </div>
+        </div>
+
+        <div style="height:20px"></div>
+      </div>
+    </div>
+
+  </div><!-- end screen-container -->
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <button class="nav-item active" id="nav-home" onclick="navigate('home')">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="nav-item" id="nav-carts" onclick="navigate('cart')" style="position:relative">
+      <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+      <span>Carts</span>
+      <span class="nav-badge">2</span>
+    </button>
+    <button class="nav-item" id="nav-inbox" onclick="navigate('inbox')" style="position:relative">
+      <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      <span>Inbox</span>
+      <span class="nav-badge">5</span>
+    </button>
+    <button class="nav-item" id="nav-wallet" onclick="navigate('wallet')">
+      <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+      <span>Wallet</span>
+    </button>
+  </div>
+
+  <div class="home-indicator"></div>
+</div>
+
+<script>
+// Screen navigation
+const screenMap = {
+  home: 'screen-home',
+  cart: 'screen-cart',
+  nike: 'screen-nike',
+  inbox: 'screen-inbox',
+  wallet: 'screen-wallet'
+};
+
+const navMap = {
+  'screen-home': 'nav-home',
+  'screen-cart': 'nav-carts',
+  'screen-nike': 'nav-home',
+  'screen-inbox': 'nav-inbox',
+  'screen-wallet': 'nav-wallet'
+};
+
+function showScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+
+  // Update nav
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navId = navMap[screenId];
+  if (navId) document.getElementById(navId).classList.add('active');
+
+  // Update status bar color based on screen
+  const statusBar = document.querySelector('.status-bar');
+  if (screenId === 'screen-nike' || screenId === 'screen-wallet') {
+    statusBar.style.color = '#fff';
+  } else {
+    statusBar.style.color = 'var(--charcoal)';
+  }
+
+  // Scroll to top
+  const content = document.getElementById(screenId).querySelector('.screen-content');
+  if (content) content.scrollTop = 0;
+}
+
+function navigate(key) {
+  showScreen(screenMap[key]);
+}
+
+// Inbox tabs
+function switchTab(tabName) {
+  document.querySelectorAll('.inbox-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.inbox-panel').forEach(p => p.classList.remove('active'));
+
+  event.target.closest('.inbox-tab').classList.add('active');
+  document.getElementById('tab-' + tabName).classList.add('active');
+}
+
+// Set initial status bar color
+document.querySelector('.status-bar').style.color = 'var(--charcoal)';
+</script>
+
+</body>
+</html>

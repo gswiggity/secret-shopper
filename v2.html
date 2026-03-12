@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secret Shopper v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f5f1;
+  --bg-white: #ffffff;
+  --bg-subtle: #eeeee8;
+  --bg-hover: #f0efeb;
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b6b6b;
+  --text-muted: #9a9a9a;
+  --accent: #2c5f2d;
+  --accent-light: #e8f0e8;
+  --accent-bg: rgba(44, 95, 45, 0.06);
+  --warn: #c0392b;
+  --warn-light: #fdf0ee;
+  --blue: #2d5aa0;
+  --blue-light: #edf2fa;
+  --amber: #b8860b;
+  --amber-light: #faf5e8;
+  --violet: #6c5ce7;
+  --violet-light: #f0eefa;
+  --border: #e4e3de;
+  --border-light: #eeedea;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #e8e7e3;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.iphone-frame {
+  width: 393px;
+  height: 852px;
+  background: var(--bg);
+  border-radius: 55px;
+  border: 3px solid #c8c7c2;
+  box-shadow: 0 0 0 1px #b0afaa, 0 40px 100px rgba(0,0,0,0.18), inset 0 0 0 1px rgba(255,255,255,0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.dynamic-island {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 126px;
+  height: 37px;
+  background: #1a1a1a;
+  border-radius: 20px;
+  z-index: 100;
+}
+
+.status-bar {
+  position: absolute;
+  top: 16px;
+  left: 36px;
+  right: 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 99;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.status-bar-right {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.battery {
+  width: 25px;
+  height: 12px;
+  border: 1.5px solid var(--text-primary);
+  border-radius: 3px;
+  position: relative;
+}
+.battery::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  top: 2px;
+  width: 2px;
+  height: 6px;
+  background: var(--text-primary);
+  border-radius: 0 1px 1px 0;
+}
+.battery-fill {
+  width: 75%;
+  height: 100%;
+  background: var(--text-primary);
+  border-radius: 1px;
+}
+
+.signal-bars {
+  display: flex;
+  gap: 1.5px;
+  align-items: flex-end;
+  height: 12px;
+}
+.signal-bar {
+  width: 3px;
+  background: var(--text-primary);
+  border-radius: 1px;
+}
+
+.screen-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 59px;
+  padding-bottom: 84px;
+}
+
+.screen {
+  display: none;
+  height: 100%;
+  overflow-y: auto;
+  padding: 0 20px;
+  scrollbar-width: none;
+}
+.screen::-webkit-scrollbar { display: none; }
+.screen.active { display: block; }
+
+/* Bottom Nav */
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 84px;
+  background: var(--bg-white);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding-top: 10px;
+  z-index: 50;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s;
+}
+
+.nav-item svg {
+  width: 22px;
+  height: 22px;
+  stroke: var(--text-muted);
+  fill: none;
+  stroke-width: 1.8;
+  transition: all 0.15s;
+}
+
+.nav-item span {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.nav-item.active svg { stroke: var(--accent); stroke-width: 2; }
+.nav-item.active span { color: var(--accent); font-weight: 600; }
+
+.nav-icon-wrap {
+  position: relative;
+}
+
+.nav-badge {
+  position: absolute;
+  top: -3px;
+  right: -8px;
+  min-width: 16px;
+  height: 16px;
+  background: var(--warn);
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 700;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 3px;
+  z-index: 100;
+}
+
+/* Typography */
+h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 24px;
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+}
+
+h2 {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: -0.2px;
+}
+
+h3 {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+  margin-top: 24px;
+}
+
+.section-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+}
+
+.section-action {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+/* Tags */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.tag-green { background: var(--accent-light); color: var(--accent); }
+.tag-red { background: var(--warn-light); color: var(--warn); }
+.tag-blue { background: var(--blue-light); color: var(--blue); }
+.tag-amber { background: var(--amber-light); color: var(--amber); }
+.tag-violet { background: var(--violet-light); color: var(--violet); }
+
+/* Card */
+.card {
+  background: var(--bg-white);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.card:hover { background: var(--bg-hover); }
+
+/* Progress */
+.progress-track {
+  height: 3px;
+  background: var(--bg-subtle);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+
+/* ===== DASHBOARD ===== */
+.dash-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0 20px;
+}
+
+.dash-greeting {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 1px;
+}
+
+.dash-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Tracking hero */
+.tracking-hero {
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: 16px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.tracking-hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.tracking-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.shipment-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border-light);
+}
+.shipment-row:first-of-type { border-top: none; }
+
+.brand-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.shipment-info { flex: 1; min-width: 0; }
+.shipment-brand {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+.shipment-status {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shipment-eta {
+  text-align: right;
+  flex-shrink: 0;
+}
+.eta-val {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--accent);
+}
+.eta-sub {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.shipment-progress {
+  margin-top: 5px;
+}
+
+/* Brands row */
+.brands-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 0 6px;
+  scrollbar-width: none;
+}
+.brands-row::-webkit-scrollbar { display: none; }
+
+.brand-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 8px 8px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 40px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.brand-chip:hover { border-color: var(--accent); }
+
+.brand-chip-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.brand-chip-name {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.brand-chip-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-left: -2px;
+}
+
+/* Deals */
+.deal-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.deal-row:hover { background: var(--bg-hover); }
+
+.deal-content { flex: 1; min-width: 0; }
+.deal-brand {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 1px;
+}
+.deal-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.deal-pct {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* Cart cards */
+.cart-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cart-card:hover { background: var(--bg-hover); }
+
+.cart-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.cart-brand-name {
+  font-weight: 600;
+  font-size: 13px;
+  flex: 1;
+}
+
+.cart-total-amt {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.cart-meta {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.ai-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--violet-light);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(108, 92, 231, 0.1);
+}
+.ai-hint-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.ai-hint span {
+  font-size: 11px;
+  color: var(--violet);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Wishlist */
+.wishlist-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 6px;
+}
+
+.wishlist-emoji {
+  font-size: 22px;
+}
+
+.wishlist-info { flex: 1; }
+.wishlist-name {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 1px;
+}
+.wishlist-count {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.wishlist-share {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--violet);
+  background: var(--violet-light);
+  border: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ===== CART DETAIL ===== */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 10px 0 14px;
+  font-weight: 500;
+}
+.back-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--text-secondary);
+  fill: none;
+  stroke-width: 2;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.detail-header-text h2 { margin-bottom: 2px; }
+.detail-header-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.item-card {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 6px;
+}
+
+.item-thumb {
+  width: 56px;
+  height: 56px;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.item-info { flex: 1; }
+.item-name {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 1px;
+}
+.item-variant {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.item-prices {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.item-price-now {
+  font-weight: 700;
+  font-size: 14px;
+}
+.item-price-was {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+/* Chart */
+.chart-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin: 14px 0;
+}
+
+.chart-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.chart-area {
+  height: 100px;
+  position: relative;
+}
+
+.chart-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+/* AI Card */
+.ai-card {
+  background: var(--bg-white);
+  border: 1px solid rgba(108, 92, 231, 0.2);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin: 14px 0;
+}
+
+.ai-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ai-icon {
+  width: 28px;
+  height: 28px;
+  background: var(--violet-light);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ai-icon svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--violet);
+  fill: none;
+  stroke-width: 2;
+}
+
+.ai-card-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--violet);
+}
+
+.ai-body {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+
+.confidence-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.confidence-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.confidence-track {
+  flex: 1;
+  height: 3px;
+  background: var(--bg-subtle);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.confidence-fill {
+  height: 100%;
+  background: var(--violet);
+  border-radius: 2px;
+}
+.confidence-pct {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--violet);
+}
+
+/* Purchase section */
+.purchase-section {
+  margin: 18px 0 16px;
+}
+
+.wallet-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+}
+.wallet-strip-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.wallet-strip-val {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--accent);
+}
+
+.btn-buy {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-buy:hover {
+  background: #234d24;
+}
+.btn-buy-sub {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.8;
+  display: block;
+  margin-top: 2px;
+}
+
+/* ===== RETAILER ===== */
+.retailer-top {
+  text-align: center;
+  padding: 12px 0 18px;
+}
+
+.retailer-icon-lg {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 22px;
+  margin: 0 auto 10px;
+}
+
+.retailer-url {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Shield */
+.shield-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  background: var(--accent-light);
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+}
+
+.shield-grade {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--accent);
+}
+.shield-text {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.shield-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.shield-cell {
+  text-align: center;
+  padding: 10px 4px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.shield-cell-val {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+.shield-cell-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* Alias / info rows */
+.info-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 13px 14px;
+  margin-bottom: 6px;
+}
+
+.info-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.info-value {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', monospace;
+  color: var(--accent);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-action {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-light);
+  border: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Return cards */
+.return-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 6px;
+}
+
+.return-countdown {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 15px;
+  font-family: 'Fraunces', serif;
+  flex-shrink: 0;
+}
+.return-countdown small {
+  font-size: 8px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.return-info { flex: 1; }
+.return-item {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 1px;
+}
+.return-date {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* Orders */
+.order-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.order-line:last-child { border-bottom: none; }
+
+.order-id {
+  font-weight: 600;
+  font-size: 13px;
+}
+.order-date {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.order-amt {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ===== INBOX ===== */
+.inbox-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+
+.inbox-tab {
+  flex: 1;
+  padding: 10px 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  position: relative;
+}
+.inbox-tab.active {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent);
+}
+
+.tab-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--warn);
+  border-radius: 50%;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.email-row {
+  padding: 13px 14px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.email-row:hover { background: var(--bg-hover); }
+
+.email-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.email-from {
+  font-weight: 600;
+  font-size: 13px;
+}
+.email-time {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.email-subject {
+  font-size: 13px;
+  margin-bottom: 3px;
+  line-height: 1.3;
+}
+
+.email-preview {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.email-tags {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+/* Promo card */
+.promo-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  background: var(--bg-white);
+  border: 1px solid rgba(44, 95, 45, 0.15);
+  border-radius: var(--radius-md);
+  margin-bottom: 6px;
+}
+
+.promo-code-box {
+  padding: 6px 10px;
+  background: var(--accent-light);
+  border: 1px dashed rgba(44, 95, 45, 0.3);
+  border-radius: 6px;
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.promo-info { flex: 1; }
+.promo-brand {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 1px;
+}
+.promo-exp {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.promo-apply {
+  padding: 7px 14px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* Blocked */
+.blocked-summary {
+  text-align: center;
+  padding: 30px 16px;
+  color: var(--text-muted);
+}
+.blocked-number {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 40px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.blocked-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.blocked-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 4px;
+  opacity: 0.55;
+}
+.blocked-row .email-from { font-size: 12px; }
+.blocked-row .email-subject {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== WALLET ===== */
+.wallet-hero {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  text-align: center;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.wallet-amount {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 38px;
+  color: var(--text-primary);
+  margin: 6px 0 2px;
+  letter-spacing: -1px;
+}
+
+.wallet-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.wallet-btns {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.wallet-btn {
+  flex: 1;
+  padding: 11px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  color: var(--text-primary);
+  transition: all 0.15s;
+}
+.wallet-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.wallet-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 6px;
+}
+
+.wallet-row-info { flex: 1; }
+.wallet-row-brand {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 1px;
+}
+.wallet-row-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.wallet-row-bal {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.txn-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.txn-line:last-child { border-bottom: none; }
+.txn-desc {
+  font-weight: 500;
+  font-size: 13px;
+  margin-bottom: 1px;
+}
+.txn-date {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.txn-amt {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 14px;
+}
+.txn-neg { color: var(--text-primary); }
+.txn-pos { color: var(--accent); }
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.anim > * {
+  animation: fadeUp 0.3s ease backwards;
+}
+.anim > *:nth-child(1) { animation-delay: 0.03s; }
+.anim > *:nth-child(2) { animation-delay: 0.06s; }
+.anim > *:nth-child(3) { animation-delay: 0.09s; }
+.anim > *:nth-child(4) { animation-delay: 0.12s; }
+.anim > *:nth-child(5) { animation-delay: 0.15s; }
+.anim > *:nth-child(6) { animation-delay: 0.18s; }
+.anim > *:nth-child(7) { animation-delay: 0.21s; }
+.anim > *:nth-child(8) { animation-delay: 0.24s; }
+.anim > *:nth-child(9) { animation-delay: 0.27s; }
+.anim > *:nth-child(10) { animation-delay: 0.3s; }
+.anim > *:nth-child(11) { animation-delay: 0.33s; }
+.anim > *:nth-child(12) { animation-delay: 0.36s; }
+.anim > *:nth-child(13) { animation-delay: 0.39s; }
+</style>
+</head>
+<body>
+
+<div class="iphone-frame">
+  <div class="dynamic-island"></div>
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-bar-right">
+      <div class="signal-bars">
+        <div class="signal-bar" style="height:4px"></div>
+        <div class="signal-bar" style="height:6px"></div>
+        <div class="signal-bar" style="height:8px"></div>
+        <div class="signal-bar" style="height:11px"></div>
+      </div>
+      <span style="font-size:12px">5G</span>
+      <div class="battery"><div class="battery-fill"></div></div>
+    </div>
+  </div>
+
+  <div class="screen-container">
+
+    <!-- DASHBOARD -->
+    <div class="screen active anim" id="screen-dashboard">
+      <div class="dash-top">
+        <div>
+          <div class="dash-greeting">Good evening, Gabi</div>
+          <h1>Secret Shopper</h1>
+        </div>
+        <div class="dash-avatar">G</div>
+      </div>
+
+      <!-- Tracking Hero -->
+      <div class="tracking-hero">
+        <div class="tracking-hero-top">
+          <h3>In Transit</h3>
+          <div class="tracking-count">3 packages</div>
+        </div>
+        <div class="shipment-row" onclick="navigateTo('retailer')">
+          <div class="brand-icon" style="background:#ff6b35; color:#fff">N</div>
+          <div class="shipment-info">
+            <div class="shipment-brand">Nike</div>
+            <div class="shipment-status">Out for delivery — Philadelphia, PA</div>
+            <div class="shipment-progress" style="margin-top:5px">
+              <div class="progress-track"><div class="progress-fill" style="width:92%; background:var(--accent)"></div></div>
+            </div>
+          </div>
+          <div class="shipment-eta">
+            <div class="eta-val">Today</div>
+            <div class="eta-sub">by 8pm</div>
+          </div>
+        </div>
+        <div class="shipment-row">
+          <div class="brand-icon" style="background:#1a1a1a; color:#fff">A</div>
+          <div class="shipment-info">
+            <div class="shipment-brand">Apple</div>
+            <div class="shipment-status">In transit — Memphis, TN</div>
+            <div class="shipment-progress" style="margin-top:5px">
+              <div class="progress-track"><div class="progress-fill" style="width:60%; background:var(--blue)"></div></div>
+            </div>
+          </div>
+          <div class="shipment-eta">
+            <div class="eta-val" style="color:var(--blue)">Mar 14</div>
+            <div class="eta-sub">est.</div>
+          </div>
+        </div>
+        <div class="shipment-row">
+          <div class="brand-icon" style="background:#e91e8c; color:#fff">G</div>
+          <div class="shipment-info">
+            <div class="shipment-brand">Glossier</div>
+            <div class="shipment-status">Label created — awaiting pickup</div>
+            <div class="shipment-progress" style="margin-top:5px">
+              <div class="progress-track"><div class="progress-fill" style="width:12%; background:var(--amber)"></div></div>
+            </div>
+          </div>
+          <div class="shipment-eta">
+            <div class="eta-val" style="color:var(--amber)">Mar 17</div>
+            <div class="eta-sub">est.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Brands -->
+      <div class="section-header">
+        <div class="section-title">Your Brands</div>
+        <div class="section-action">See all</div>
+      </div>
+      <div class="brands-row">
+        <div class="brand-chip" onclick="navigateTo('retailer')">
+          <div class="brand-chip-icon" style="background:#ff6b35; color:#fff">N</div>
+          <div class="brand-chip-name">Nike</div>
+        </div>
+        <div class="brand-chip">
+          <div class="brand-chip-icon" style="background:#1a1a1a; color:#fff">A</div>
+          <div class="brand-chip-name">Apple</div>
+        </div>
+        <div class="brand-chip">
+          <div class="brand-chip-icon" style="background:#FF9900; color:#fff">A</div>
+          <div class="brand-chip-name">Amazon</div>
+          <span class="brand-chip-badge tag-red" style="font-size:9px">2</span>
+        </div>
+        <div class="brand-chip">
+          <div class="brand-chip-icon" style="background:#e91e8c; color:#fff">G</div>
+          <div class="brand-chip-name">Glossier</div>
+        </div>
+        <div class="brand-chip">
+          <div class="brand-chip-icon" style="background:#2d6a4f; color:#fff">R</div>
+          <div class="brand-chip-name">REI</div>
+        </div>
+        <div class="brand-chip">
+          <div class="brand-chip-icon" style="background:#003087; color:#fff">P</div>
+          <div class="brand-chip-name">Patagonia</div>
+        </div>
+      </div>
+
+      <!-- Deals -->
+      <div class="section-header">
+        <div class="section-title">Recent Deals</div>
+        <div class="section-action" onclick="navigateTo('inbox')">View all</div>
+      </div>
+      <div class="deal-row" onclick="navigateTo('inbox')">
+        <div class="brand-icon" style="background:#FF9900; color:#fff; width:36px; height:36px; font-size:12px">A</div>
+        <div class="deal-content">
+          <div class="deal-brand">Amazon</div>
+          <div class="deal-desc">Lightning deal on your saved AirPods Max</div>
+        </div>
+        <div class="deal-pct">-32%</div>
+      </div>
+      <div class="deal-row">
+        <div class="brand-icon" style="background:#ff6b35; color:#fff; width:36px; height:36px; font-size:12px">N</div>
+        <div class="deal-content">
+          <div class="deal-brand">Nike</div>
+          <div class="deal-desc">Member-exclusive: extra 25% off clearance</div>
+        </div>
+        <div class="deal-pct">25%</div>
+      </div>
+      <div class="deal-row">
+        <div class="brand-icon" style="background:#2d6a4f; color:#fff; width:36px; height:36px; font-size:12px">R</div>
+        <div class="deal-content">
+          <div class="deal-brand">REI</div>
+          <div class="deal-desc">Anniversary sale — 20% one full-price item</div>
+        </div>
+        <div class="deal-pct">20%</div>
+      </div>
+
+      <!-- Carts -->
+      <div class="section-header">
+        <div class="section-title">Abandoned Carts</div>
+      </div>
+      <div class="cart-card" onclick="navigateTo('cart')">
+        <div class="cart-top">
+          <div class="brand-icon" style="background:#FF9900; color:#fff; width:32px; height:32px; font-size:11px">A</div>
+          <div class="cart-brand-name">Amazon</div>
+          <div class="cart-total-amt">$247.83</div>
+        </div>
+        <div class="cart-meta">3 items &middot; Abandoned 3 days ago</div>
+        <div class="ai-hint">
+          <svg class="ai-hint-icon" viewBox="0 0 24 24" fill="none" stroke="#6c5ce7" stroke-width="2"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
+          <span>Promo likely in 2 days — Amazon sends codes after 5-day abandon</span>
+        </div>
+      </div>
+      <div class="cart-card">
+        <div class="cart-top">
+          <div class="brand-icon" style="background:#2d6a4f; color:#fff; width:32px; height:32px; font-size:11px">R</div>
+          <div class="cart-brand-name">REI</div>
+          <div class="cart-total-amt">$134.99</div>
+        </div>
+        <div class="cart-meta">1 item — Trail Runner 2.0 &middot; 7 days ago</div>
+      </div>
+
+      <!-- Wishlists -->
+      <div class="section-header">
+        <div class="section-title">Shared Wishlists</div>
+        <div class="section-action">+ New</div>
+      </div>
+      <div class="wishlist-row">
+        <div class="wishlist-emoji">&#127873;</div>
+        <div class="wishlist-info">
+          <div class="wishlist-name">Birthday Picks 2026</div>
+          <div class="wishlist-count">7 items</div>
+        </div>
+        <button class="wishlist-share">Share</button>
+      </div>
+
+      <div style="height:16px"></div>
+    </div>
+
+    <!-- CART DETAIL -->
+    <div class="screen anim" id="screen-cart">
+      <div class="back-btn" onclick="navigateTo('dashboard')">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+      </div>
+
+      <div class="detail-header">
+        <div class="brand-icon" style="background:#FF9900; color:#fff; width:48px; height:48px; font-size:17px">A</div>
+        <div class="detail-header-text">
+          <h2>Amazon Cart</h2>
+          <div class="detail-header-sub">3 items &middot; Abandoned 3 days ago</div>
+        </div>
+      </div>
+
+      <div class="item-card">
+        <div class="item-thumb">&#127911;</div>
+        <div class="item-info">
+          <div class="item-name">Sony WH-1000XM5</div>
+          <div class="item-variant">Color: Black</div>
+          <div class="item-prices">
+            <span class="item-price-now">$328.00</span>
+            <span class="item-price-was">$399.99</span>
+            <span class="tag tag-green" style="margin-left:2px">-$72</span>
+          </div>
+        </div>
+      </div>
+      <div class="item-card">
+        <div class="item-thumb">&#128268;</div>
+        <div class="item-info">
+          <div class="item-name">Anker USB-C Hub 7-in-1</div>
+          <div class="item-variant">Space Gray</div>
+          <div class="item-prices">
+            <span class="item-price-now">$34.99</span>
+          </div>
+        </div>
+      </div>
+      <div class="item-card">
+        <div class="item-thumb">&#128218;</div>
+        <div class="item-info">
+          <div class="item-name">Designing Data-Intensive Apps</div>
+          <div class="item-variant">Paperback</div>
+          <div class="item-prices">
+            <span class="item-price-now">$33.36</span>
+            <span class="item-price-was">$44.99</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Price History -->
+      <div class="chart-card">
+        <div class="chart-top">
+          <h3>Price History</h3>
+          <span class="tag tag-green">&#8595; $72 from peak</span>
+        </div>
+        <div class="chart-area">
+          <svg class="chart-svg" viewBox="0 0 320 90" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="cg2" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(44,95,45,0.15)"/>
+                <stop offset="100%" stop-color="rgba(44,95,45,0)"/>
+              </linearGradient>
+            </defs>
+            <line x1="0" y1="10" x2="320" y2="10" stroke="#e4e3de" stroke-dasharray="3,3"/>
+            <path d="M0,15 C30,14 50,18 80,12 C110,6 130,20 160,10 C190,2 210,25 240,35 C270,42 290,38 320,52" fill="none" stroke="var(--accent)" stroke-width="2"/>
+            <path d="M0,15 C30,14 50,18 80,12 C110,6 130,20 160,10 C190,2 210,25 240,35 C270,42 290,38 320,52 L320,90 L0,90Z" fill="url(#cg2)"/>
+            <circle cx="320" cy="52" r="3.5" fill="var(--accent)"/>
+            <text x="4" y="8" fill="var(--text-muted)" font-size="8" font-family="DM Sans">$399</text>
+            <text x="280" y="48" fill="var(--accent)" font-size="8" font-family="DM Sans" font-weight="600">$328</text>
+          </svg>
+        </div>
+        <div class="chart-labels">
+          <span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span>
+        </div>
+      </div>
+
+      <!-- AI Prediction -->
+      <div class="ai-card">
+        <div class="ai-card-top">
+          <div class="ai-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg></div>
+          <div class="ai-card-title">Agent Prediction</div>
+        </div>
+        <div class="ai-body">
+          Amazon typically sends a <strong>10–15% promo code</strong> after 5 days of cart abandonment for electronics. You're at day 3. <strong>Wait 2 more days</strong> for a likely code worth ~$33–49 off.
+        </div>
+        <div class="confidence-row">
+          <span class="confidence-label">Confidence</span>
+          <div class="confidence-track"><div class="confidence-fill" style="width:78%"></div></div>
+          <span class="confidence-pct">78%</span>
+        </div>
+      </div>
+
+      <!-- Purchase -->
+      <div class="purchase-section">
+        <div class="wallet-strip">
+          <span class="wallet-strip-label">Amazon Wallet</span>
+          <span class="wallet-strip-val">$400.00</span>
+        </div>
+        <button class="btn-buy">
+          Approve $247.83
+          <span class="btn-buy-sub">Pays from wallet &middot; alias checkout</span>
+        </button>
+      </div>
+
+      <div style="height:16px"></div>
+    </div>
+
+    <!-- RETAILER -->
+    <div class="screen anim" id="screen-retailer">
+      <div class="back-btn" onclick="navigateTo('dashboard')">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+      </div>
+
+      <div class="retailer-top">
+        <div class="retailer-icon-lg" style="background:#ff6b35; color:#fff">N</div>
+        <h1>Nike</h1>
+        <div class="retailer-url">nike.com</div>
+      </div>
+
+      <div class="shield-banner">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div class="shield-grade">A-</div>
+        <div class="shield-text">Shield Score</div>
+      </div>
+
+      <div class="shield-grid">
+        <div class="shield-cell">
+          <div class="shield-cell-val" style="color:var(--accent)">Low</div>
+          <div class="shield-cell-label">Email Spam</div>
+        </div>
+        <div class="shield-cell">
+          <div class="shield-cell-val" style="color:var(--amber)">Med</div>
+          <div class="shield-cell-label">Data Sharing</div>
+        </div>
+        <div class="shield-cell">
+          <div class="shield-cell-val" style="color:var(--accent)">None</div>
+          <div class="shield-cell-label">Dark Patterns</div>
+        </div>
+      </div>
+
+      <div class="section-header"><div class="section-title">Email Alias</div></div>
+      <div class="info-card">
+        <div class="info-row">
+          <div>
+            <div class="info-label">Alias for nike.com</div>
+            <div class="info-value">gabi.xk7m@secretshopper.me</div>
+          </div>
+          <button class="info-action">Copy</button>
+        </div>
+      </div>
+
+      <div class="section-header"><div class="section-title">Wallet</div></div>
+      <div class="info-card">
+        <div class="info-row">
+          <div>
+            <div class="info-label">Nike Wallet Balance</div>
+            <div style="font-family:'Fraunces',serif; font-weight:700; font-size:20px; color:var(--text-primary)">$150.00</div>
+          </div>
+          <button class="info-action">Add Funds</button>
+        </div>
+      </div>
+
+      <div class="section-header"><div class="section-title">Return Windows</div></div>
+      <div class="return-row">
+        <div class="return-countdown" style="background:var(--warn-light); color:var(--warn)">
+          4
+          <small>days</small>
+        </div>
+        <div class="return-info">
+          <div class="return-item">Air Max 90 — #NK-8834</div>
+          <div class="return-date">Return by Mar 15, 2026</div>
+        </div>
+      </div>
+      <div class="return-row">
+        <div class="return-countdown" style="background:var(--accent-light); color:var(--accent)">
+          22
+          <small>days</small>
+        </div>
+        <div class="return-info">
+          <div class="return-item">Dri-FIT Tee — #NK-9012</div>
+          <div class="return-date">Return by Apr 2, 2026</div>
+        </div>
+      </div>
+
+      <div class="section-header"><div class="section-title">Order History</div></div>
+      <div class="info-card" style="padding:2px 14px">
+        <div class="order-line">
+          <div><div class="order-id">#NK-9012</div><div class="order-date">Mar 2, 2026</div></div>
+          <div style="text-align:right"><div class="order-amt">$42.00</div><span class="tag tag-green" style="font-size:10px">Delivered</span></div>
+        </div>
+        <div class="order-line">
+          <div><div class="order-id">#NK-8834</div><div class="order-date">Feb 18, 2026</div></div>
+          <div style="text-align:right"><div class="order-amt">$129.99</div><span class="tag tag-green" style="font-size:10px">Delivered</span></div>
+        </div>
+        <div class="order-line">
+          <div><div class="order-id">#NK-7201</div><div class="order-date">Jan 5, 2026</div></div>
+          <div style="text-align:right"><div class="order-amt">$215.00</div><span class="tag tag-green" style="font-size:10px">Delivered</span></div>
+        </div>
+      </div>
+
+      <div style="height:16px"></div>
+    </div>
+
+    <!-- INBOX -->
+    <div class="screen anim" id="screen-inbox">
+      <div style="padding:10px 0 16px; display:flex; justify-content:space-between; align-items:center">
+        <h1>Inbox</h1>
+        <span class="tag tag-red">5 new</span>
+      </div>
+
+      <div class="inbox-tabs">
+        <div class="inbox-tab active" onclick="switchTab(this,'tracking')">Tracking <span class="tab-dot"></span></div>
+        <div class="inbox-tab" onclick="switchTab(this,'promos')">Promos <span class="tab-dot"></span></div>
+        <div class="inbox-tab" onclick="switchTab(this,'blocked')">Blocked</div>
+      </div>
+
+      <div class="inbox-content" id="tab-tracking">
+        <div class="email-row">
+          <div class="email-header">
+            <span class="email-from">Nike via alias</span>
+            <span class="email-time">2h ago</span>
+          </div>
+          <div class="email-subject">Your order has shipped!</div>
+          <div class="email-preview">Order #NK-9912 is on its way. Estimated delivery: Today by 8pm. Track your package for real-time updates.</div>
+          <div class="email-tags">
+            <span class="tag tag-green">Tracking extracted</span>
+            <span class="tag tag-amber">Forwarded</span>
+          </div>
+        </div>
+        <div class="email-row">
+          <div class="email-header">
+            <span class="email-from">Apple via alias</span>
+            <span class="email-time">1d ago</span>
+          </div>
+          <div class="email-subject">Your MacBook Pro is in transit</div>
+          <div class="email-preview">Great news! Your order is on its way. Current location: Memphis, TN distribution hub.</div>
+          <div class="email-tags">
+            <span class="tag tag-green">Tracking extracted</span>
+            <span class="tag tag-amber">Forwarded</span>
+          </div>
+        </div>
+        <div class="email-row">
+          <div class="email-header">
+            <span class="email-from">Glossier via alias</span>
+            <span class="email-time">3d ago</span>
+          </div>
+          <div class="email-subject">Order confirmed — shipping soon</div>
+          <div class="email-preview">We're getting your order ready! You'll receive tracking info once it ships from our warehouse.</div>
+          <div class="email-tags">
+            <span class="tag tag-amber">Forwarded</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="inbox-content" id="tab-promos" style="display:none">
+        <div class="promo-card">
+          <div class="promo-code-box">SAVE25</div>
+          <div class="promo-info">
+            <div class="promo-brand">Nike — 25% off clearance</div>
+            <div class="promo-exp">Expires Mar 15</div>
+          </div>
+          <button class="promo-apply">Apply</button>
+        </div>
+        <div class="promo-card">
+          <div class="promo-code-box">SPRING15</div>
+          <div class="promo-info">
+            <div class="promo-brand">REI — 15% one item</div>
+            <div class="promo-exp">Expires Mar 20</div>
+          </div>
+          <button class="promo-apply">Apply</button>
+        </div>
+        <div class="email-row">
+          <div class="email-header">
+            <span class="email-from">Amazon via alias</span>
+            <span class="email-time">5h ago</span>
+          </div>
+          <div class="email-subject">Still thinking about it? Here's 10% off</div>
+          <div class="email-preview">We noticed items in your cart. Use code COMEBACK10 for 10% off your next order.</div>
+          <div class="email-tags">
+            <span class="tag tag-green">Code: COMEBACK10</span>
+            <span class="tag tag-violet">AI predicted this</span>
+          </div>
+        </div>
+        <div class="email-row">
+          <div class="email-header">
+            <span class="email-from">Glossier via alias</span>
+            <span class="email-time">2d ago</span>
+          </div>
+          <div class="email-subject">Free shipping on your next order!</div>
+          <div class="email-preview">As a thank you for your recent purchase, enjoy free shipping. No minimum required.</div>
+          <div class="email-tags">
+            <span class="tag tag-green">Free shipping</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="inbox-content" id="tab-blocked" style="display:none">
+        <div class="blocked-summary">
+          <div class="blocked-number">47</div>
+          <div class="blocked-label">emails blocked this month</div>
+          <p style="font-size:12px; color:var(--text-muted); line-height:1.5">Newsletters, "we miss you" campaigns, and surveys — filtered by your aliases. Only tracking and promos get through.</p>
+        </div>
+        <div class="blocked-row">
+          <div class="brand-icon" style="background:#ff6b35; color:#fff; width:28px; height:28px; font-size:10px; border-radius:7px; flex-shrink:0">N</div>
+          <span class="email-subject">Take our quick survey for 10% off!</span>
+          <span class="tag tag-red" style="font-size:9px; flex-shrink:0">Survey</span>
+        </div>
+        <div class="blocked-row">
+          <div class="brand-icon" style="background:#FF9900; color:#fff; width:28px; height:28px; font-size:10px; border-radius:7px; flex-shrink:0">A</div>
+          <span class="email-subject">Recommended for you: Top picks in Electronics</span>
+          <span class="tag tag-red" style="font-size:9px; flex-shrink:0">Marketing</span>
+        </div>
+        <div class="blocked-row">
+          <div class="brand-icon" style="background:#e91e8c; color:#fff; width:28px; height:28px; font-size:10px; border-radius:7px; flex-shrink:0">G</div>
+          <span class="email-subject">New arrivals you'll love</span>
+          <span class="tag tag-red" style="font-size:9px; flex-shrink:0">Marketing</span>
+        </div>
+        <div class="blocked-row">
+          <div class="brand-icon" style="background:#2d6a4f; color:#fff; width:28px; height:28px; font-size:10px; border-radius:7px; flex-shrink:0">R</div>
+          <span class="email-subject">REI Member Newsletter — March Edition</span>
+          <span class="tag tag-red" style="font-size:9px; flex-shrink:0">Newsletter</span>
+        </div>
+      </div>
+
+      <div style="height:16px"></div>
+    </div>
+
+    <!-- WALLET -->
+    <div class="screen anim" id="screen-wallet">
+      <div style="padding:10px 0 16px">
+        <h1>Wallet</h1>
+      </div>
+
+      <div class="wallet-hero">
+        <div class="section-title">Total Balance</div>
+        <div class="wallet-amount">$725.00</div>
+        <div class="wallet-sub">Across 4 retailer wallets</div>
+      </div>
+
+      <div class="wallet-btns">
+        <div class="wallet-btn">+ Add Funds</div>
+        <div class="wallet-btn">Transfer</div>
+        <div class="wallet-btn">History</div>
+      </div>
+
+      <div class="section-header"><div class="section-title">Retailer Wallets</div></div>
+      <div class="wallet-row">
+        <div class="brand-icon" style="background:#FF9900; color:#fff; width:36px; height:36px; font-size:12px">A</div>
+        <div class="wallet-row-info">
+          <div class="wallet-row-brand">Amazon</div>
+          <div class="wallet-row-sub">Last used 3 days ago</div>
+        </div>
+        <div class="wallet-row-bal">$400.00</div>
+      </div>
+      <div class="wallet-row">
+        <div class="brand-icon" style="background:#ff6b35; color:#fff; width:36px; height:36px; font-size:12px">N</div>
+        <div class="wallet-row-info">
+          <div class="wallet-row-brand">Nike</div>
+          <div class="wallet-row-sub">Last used 12 days ago</div>
+        </div>
+        <div class="wallet-row-bal">$150.00</div>
+      </div>
+      <div class="wallet-row">
+        <div class="brand-icon" style="background:#1a1a1a; color:#fff; width:36px; height:36px; font-size:12px">A</div>
+        <div class="wallet-row-info">
+          <div class="wallet-row-brand">Apple</div>
+          <div class="wallet-row-sub">Pending — MacBook Pro</div>
+        </div>
+        <div class="wallet-row-bal">$125.00</div>
+      </div>
+      <div class="wallet-row">
+        <div class="brand-icon" style="background:#2d6a4f; color:#fff; width:36px; height:36px; font-size:12px">R</div>
+        <div class="wallet-row-info">
+          <div class="wallet-row-brand">REI</div>
+          <div class="wallet-row-sub">Cart waiting — $134.99</div>
+        </div>
+        <div class="wallet-row-bal">$50.00</div>
+      </div>
+
+      <div class="section-header"><div class="section-title">Recent Transactions</div></div>
+      <div class="info-card" style="padding:2px 14px">
+        <div class="txn-line">
+          <div><div class="txn-desc">Nike — Dri-FIT Tee</div><div class="txn-date">Mar 2, 2026</div></div>
+          <div class="txn-amt txn-neg">-$42.00</div>
+        </div>
+        <div class="txn-line">
+          <div><div class="txn-desc">Amazon — Wallet Top-up</div><div class="txn-date">Feb 28, 2026</div></div>
+          <div class="txn-amt txn-pos">+$400.00</div>
+        </div>
+        <div class="txn-line">
+          <div><div class="txn-desc">Nike — Air Max 90</div><div class="txn-date">Feb 18, 2026</div></div>
+          <div class="txn-amt txn-neg">-$129.99</div>
+        </div>
+      </div>
+
+      <div style="height:16px"></div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="navigateTo('dashboard')">
+      <div class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <span>Home</span>
+    </div>
+    <div class="nav-item" onclick="navigateTo('cart')">
+      <div class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+        <div class="nav-badge">2</div>
+      </div>
+      <span>Carts</span>
+    </div>
+    <div class="nav-item" onclick="navigateTo('inbox')">
+      <div class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <div class="nav-badge">5</div>
+      </div>
+      <span>Inbox</span>
+    </div>
+    <div class="nav-item" onclick="navigateTo('wallet')">
+      <div class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M16 12h.01"/><path d="M2 10h20"/></svg>
+      </div>
+      <span>Wallet</span>
+    </div>
+  </div>
+
+  <div class="home-indicator"></div>
+</div>
+
+<script>
+function navigateTo(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + screen).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const map = { dashboard: 0, cart: 1, inbox: 2, wallet: 3, retailer: 0 };
+  document.querySelectorAll('.nav-item')[map[screen]]?.classList.add('active');
+  const el = document.getElementById('screen-' + screen);
+  el.classList.remove('anim');
+  void el.offsetWidth;
+  el.classList.add('anim');
+  el.scrollTop = 0;
+}
+
+function switchTab(tabEl, tabId) {
+  document.querySelectorAll('.inbox-tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.querySelectorAll('.inbox-content').forEach(c => c.style.display = 'none');
+  document.getElementById('tab-' + tabId).style.display = 'block';
+}
+</script>
+
+</body>
+</html>

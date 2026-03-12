@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secret Shopper v5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue-deep: #0a1f5c;
+  --blue-michigan: #00287A;
+  --blue-mid: #112d6e;
+  --blue-light: #1a3a8a;
+  --blue-glow: #2a4fa0;
+  --gold: #c8a951;
+  --gold-bright: #dbbe5e;
+  --gold-dim: #a68b3c;
+  --green: #1b4332;
+  --green-light: #2d6a4f;
+  --white: #f8f8f2;
+  --white-dim: #c8c8c0;
+  --gray: #6b7280;
+  --red: #ef4444;
+  --bg-card: rgba(16, 36, 88, 0.7);
+  --border-card: rgba(42, 79, 160, 0.4);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: #111;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: var(--white);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* IPHONE FRAME */
+.iphone-frame {
+  width: 393px;
+  height: 852px;
+  background: var(--blue-deep);
+  border-radius: 50px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 0 3px #1a1a1a, 0 0 0 6px #333, 0 20px 60px rgba(0,0,0,0.6);
+}
+
+/* DYNAMIC ISLAND */
+.dynamic-island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 126px;
+  height: 36px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 100;
+}
+
+/* STATUS BAR */
+.status-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 54px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 28px 8px;
+  z-index: 99;
+  font-size: 14px;
+  font-weight: 600;
+}
+.status-bar .time { font-size: 15px; font-weight: 700; }
+.status-bar .icons { display: flex; gap: 5px; align-items: center; font-size: 12px; }
+.status-bar .icons svg { width: 16px; height: 16px; fill: var(--white); }
+
+/* HOME INDICATOR */
+.home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 3px;
+  z-index: 100;
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 84px;
+  background: rgba(6, 15, 44, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-card);
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding-top: 10px;
+  z-index: 98;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s;
+}
+.nav-item:active { transform: scale(0.9); }
+.nav-item svg { width: 24px; height: 24px; fill: var(--gray); transition: fill 0.2s; }
+.nav-item span { font-size: 10px; color: var(--gray); font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; transition: color 0.2s; }
+.nav-item.active svg { fill: var(--gold); }
+.nav-item.active span { color: var(--gold); }
+.nav-item .badge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  background: var(--red);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nav-icon-wrap { position: relative; }
+
+/* SCREEN CONTAINER */
+.screen-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 84px;
+  overflow: hidden;
+}
+.screen {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  opacity: 0;
+  transform: translateX(30px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  -webkit-overflow-scrolling: touch;
+}
+.screen.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+.screen.slide-left {
+  transform: translateX(-30px);
+}
+.screen::-webkit-scrollbar { display: none; }
+
+/* MICHIGAN WATERMARK SVG */
+.michigan-watermark {
+  position: absolute;
+  top: 40px;
+  right: -30px;
+  width: 200px;
+  height: 280px;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* TYPOGRAPHY */
+.header-bebas {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 2px;
+}
+h1, h2, h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 1.5px; }
+
+/* CARDS */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.card-white {
+  background: rgba(248, 248, 242, 0.06);
+  border: 1px solid rgba(248, 248, 242, 0.1);
+}
+
+/* UTILITY */
+.gold { color: var(--gold); }
+.green { color: var(--green-light); }
+.text-dim { color: var(--white-dim); }
+.text-sm { font-size: 12px; }
+.text-xs { font-size: 10px; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.gap-16 { gap: 16px; }
+.mt-8 { margin-top: 8px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+
+/* STAR BULLETS */
+.star-bullet::before {
+  content: '★';
+  color: var(--gold);
+  margin-right: 6px;
+  font-size: 10px;
+}
+
+/* SECTION HEADERS */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.section-header h3 {
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: var(--white);
+}
+.section-header .see-all {
+  font-size: 11px;
+  color: var(--gold);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+/* SCREEN-SPECIFIC PADDING */
+.screen-content {
+  padding: 60px 20px 20px;
+  position: relative;
+}
+
+/* BACK BUTTON */
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--gold);
+  cursor: pointer;
+  font-weight: 500;
+  margin-bottom: 16px;
+  -webkit-tap-highlight-color: transparent;
+}
+.back-btn svg { width: 18px; height: 18px; fill: var(--gold); }
+
+/* SCROLLABLE ROW */
+.scroll-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+.scroll-row::-webkit-scrollbar { display: none; }
+
+/* PILL TABS */
+.pill-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.pill-tab {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(255,255,255,0.06);
+  color: var(--white-dim);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.pill-tab.active {
+  background: var(--gold);
+  color: var(--blue-deep);
+  border-color: var(--gold);
+}
+
+/* PROGRESS BAR */
+.progress-bar {
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-bar .fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+/* BUTTON */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { transform: scale(0.97); }
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+  color: var(--blue-deep);
+}
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--gold);
+  color: var(--gold);
+}
+.btn-green {
+  background: linear-gradient(135deg, var(--green), var(--green-light));
+  color: var(--white);
+}
+
+/* SHIELD BADGE */
+.shield-badge {
+  width: 80px;
+  height: 90px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.shield-badge .grade {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  color: var(--gold);
+  line-height: 1;
+}
+.shield-badge .label {
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--gold-dim);
+  margin-top: 2px;
+}
+
+/* AVATAR */
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  color: var(--blue-deep);
+  letter-spacing: 1px;
+}
+
+/* BRAND ICON */
+.brand-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform 0.15s;
+  position: relative;
+}
+.brand-icon:active { transform: scale(0.93); }
+.brand-icon .brand-emoji { font-size: 24px; }
+.brand-icon .brand-name {
+  font-size: 8px;
+  font-weight: 600;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--white);
+}
+.brand-icon .brand-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--red);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* DEAL CARD */
+.deal-card {
+  flex-shrink: 0;
+  width: 110px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+}
+.deal-card .deal-pct {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  color: var(--gold);
+  line-height: 1;
+}
+.deal-card .deal-brand {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 4px;
+  color: var(--white);
+}
+.deal-card .deal-desc {
+  font-size: 9px;
+  color: var(--white-dim);
+  margin-top: 2px;
+}
+
+/* TRACKING CARD */
+.tracking-card {
+  padding: 14px;
+  cursor: pointer;
+}
+.tracking-card:active { background: rgba(200,169,81,0.05); }
+.tracking-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.status-delivery { background: rgba(200,169,81,0.15); color: var(--gold); }
+.status-transit { background: rgba(42,79,160,0.3); color: #6b9fff; }
+.status-created { background: rgba(255,255,255,0.08); color: var(--white-dim); }
+
+/* INBOX ITEM */
+.inbox-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  cursor: pointer;
+}
+.inbox-item:last-child { border-bottom: none; }
+.inbox-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+.inbox-dot.read { background: transparent; }
+
+/* WALLET CARD */
+.wallet-retailer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  cursor: pointer;
+}
+.wallet-retailer:last-child { border-bottom: none; }
+
+/* TRANSACTION */
+.transaction {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.transaction:last-child { border-bottom: none; }
+
+/* CHART */
+.chart-container {
+  width: 100%;
+  height: 120px;
+  position: relative;
+}
+.chart-container svg { width: 100%; height: 100%; }
+
+/* SHIELD SVG */
+.shield-svg {
+  filter: drop-shadow(0 0 8px rgba(200,169,81,0.3));
+}
+
+/* ITEM ROW */
+.cart-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  align-items: center;
+}
+.cart-item:last-child { border-bottom: none; }
+.cart-item-img {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.cart-item-info { flex: 1; }
+
+/* AI PULSE */
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200,169,81,0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(200,169,81,0); }
+}
+.ai-pulse { animation: pulse-gold 2s infinite; }
+
+/* SCORE BAR */
+.score-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.score-bar-label {
+  font-size: 11px;
+  width: 70px;
+  color: var(--white-dim);
+}
+.score-bar-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.score-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+.score-bar-val {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gold);
+  width: 28px;
+  text-align: right;
+}
+
+/* MICHIGAN OUTLINE for decorative use */
+.mi-outline {
+  position: absolute;
+  opacity: 0.035;
+  pointer-events: none;
+}
+
+/* EAGLE MOTIF */
+.eagle-divider {
+  text-align: center;
+  margin: 16px 0;
+  position: relative;
+}
+.eagle-divider::before, .eagle-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 30%;
+  height: 1px;
+  background: var(--border-card);
+}
+.eagle-divider::before { left: 0; }
+.eagle-divider::after { right: 0; }
+.eagle-divider svg { width: 28px; height: 28px; fill: var(--gold-dim); opacity: 0.5; }
+
+/* CONFIDENCE METER */
+.confidence-ring {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<div class="iphone-frame">
+  <div class="dynamic-island"></div>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="icons">
+      <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+
+  <!-- SCREEN AREA -->
+  <div class="screen-area">
+
+    <!-- MICHIGAN STATE OUTLINE WATERMARK -->
+    <svg class="mi-outline" style="top:30px;right:-20px;width:180px;height:260px;" viewBox="0 0 200 300" fill="white">
+      <!-- Upper Peninsula -->
+      <path d="M20,80 Q25,70 40,68 Q55,60 70,62 Q85,58 95,65 Q105,60 115,63 Q125,58 135,65 Q140,70 138,78 Q130,85 120,82 Q110,88 95,85 Q80,90 65,85 Q50,88 40,83 Q30,88 20,80Z" opacity="0.8"/>
+      <!-- Lower Peninsula -->
+      <path d="M60,100 Q65,95 80,93 Q95,88 110,95 Q125,90 135,100 Q140,115 142,130 Q145,150 140,170 Q138,185 130,200 Q125,210 115,218 Q105,225 95,220 Q85,225 75,218 Q65,210 60,195 Q55,180 58,160 Q55,140 58,120 Q57,110 60,100Z" opacity="0.8"/>
+    </svg>
+
+    <!-- ========== SCREEN 1: DASHBOARD ========== -->
+    <div class="screen active" id="screen-home">
+      <div class="screen-content">
+
+        <!-- GREETING -->
+        <div class="flex items-center justify-between mb-16">
+          <div>
+            <div style="font-size:12px; color:var(--gold-dim); text-transform:uppercase; letter-spacing:2px; font-weight:600;">Secret Shopper</div>
+            <h1 style="font-size:28px; margin-top:2px;">Hey, Gabi</h1>
+          </div>
+          <div class="avatar">GS</div>
+        </div>
+
+        <!-- HERO: TRACKING -->
+        <div class="section-header">
+          <h3>★ ACTIVE SHIPMENTS</h3>
+          <span class="see-all">View All</span>
+        </div>
+
+        <div class="card tracking-card" onclick="goToScreen('screen-cart-detail')">
+          <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-8">
+              <span style="font-size:20px;">👟</span>
+              <div>
+                <div style="font-weight:600; font-size:14px;">Nike Air Max 90</div>
+                <div class="text-sm text-dim">Philadelphia, PA</div>
+              </div>
+            </div>
+            <div class="tracking-status status-delivery">★ Arriving Today</div>
+          </div>
+          <div class="progress-bar"><div class="fill" style="width:90%;background:var(--gold);"></div></div>
+        </div>
+
+        <div class="card tracking-card">
+          <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-8">
+              <span style="font-size:20px;">💻</span>
+              <div>
+                <div style="font-weight:600; font-size:14px;">MacBook Pro Charger</div>
+                <div class="text-sm text-dim">Memphis, TN</div>
+              </div>
+            </div>
+            <div class="tracking-status status-transit">In Transit</div>
+          </div>
+          <div class="progress-bar"><div class="fill" style="width:55%;background:var(--blue-glow);"></div></div>
+        </div>
+
+        <div class="card tracking-card">
+          <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-8">
+              <span style="font-size:20px;">✨</span>
+              <div>
+                <div style="font-weight:600; font-size:14px;">Glossier Cloud Paint Set</div>
+                <div class="text-sm text-dim">Label Created</div>
+              </div>
+            </div>
+            <div class="tracking-status status-created">Pending</div>
+          </div>
+          <div class="progress-bar"><div class="fill" style="width:10%;background:rgba(255,255,255,0.2);"></div></div>
+        </div>
+
+        <!-- BRANDS ROW -->
+        <div class="section-header" style="margin-top:20px;">
+          <h3>★ YOUR BRANDS</h3>
+        </div>
+        <div class="scroll-row" style="margin-bottom:16px;">
+          <div class="brand-icon" style="background:rgba(255,153,0,0.15);" onclick="goToScreen('screen-retailer')">
+            <div class="brand-badge">3</div>
+            <div class="brand-emoji">🛒</div>
+            <div class="brand-name">Amazon</div>
+          </div>
+          <div class="brand-icon" style="background:rgba(255,255,255,0.08);" onclick="goToScreen('screen-retailer')">
+            <div class="brand-badge">1</div>
+            <div class="brand-emoji">✓</div>
+            <div class="brand-name">Nike</div>
+          </div>
+          <div class="brand-icon" style="background:rgba(200,169,81,0.12);">
+            <div class="brand-emoji">🍎</div>
+            <div class="brand-name">Apple</div>
+          </div>
+          <div class="brand-icon" style="background:rgba(45,106,79,0.2);">
+            <div class="brand-emoji">🏔️</div>
+            <div class="brand-name">REI</div>
+          </div>
+          <div class="brand-icon" style="background:rgba(255,182,193,0.15);">
+            <div class="brand-emoji">💄</div>
+            <div class="brand-name">Glossier</div>
+          </div>
+          <div class="brand-icon" style="background:rgba(255,255,255,0.06);">
+            <div class="brand-emoji">🎯</div>
+            <div class="brand-name">Target</div>
+          </div>
+        </div>
+
+        <!-- RECENT DEALS -->
+        <div class="section-header">
+          <h3>★ DEALS DETECTED</h3>
+          <span class="see-all">Browse</span>
+        </div>
+        <div class="scroll-row" style="margin-bottom:16px;">
+          <div class="card deal-card" style="margin-bottom:0;">
+            <div class="deal-pct">-32%</div>
+            <div class="deal-brand">Amazon</div>
+            <div class="deal-desc">Electronics Sale</div>
+          </div>
+          <div class="card deal-card" style="margin-bottom:0;">
+            <div class="deal-pct">-25%</div>
+            <div class="deal-brand">Nike</div>
+            <div class="deal-desc">Member Early Access</div>
+          </div>
+          <div class="card deal-card" style="margin-bottom:0;">
+            <div class="deal-pct">-20%</div>
+            <div class="deal-brand">REI</div>
+            <div class="deal-desc">Anniversary Sale</div>
+          </div>
+          <div class="card deal-card" style="margin-bottom:0;">
+            <div class="deal-pct">-15%</div>
+            <div class="deal-brand">Target</div>
+            <div class="deal-desc">Circle Week</div>
+          </div>
+        </div>
+
+        <!-- ABANDONED CARTS -->
+        <div class="section-header">
+          <h3>★ ABANDONED CARTS</h3>
+        </div>
+
+        <div class="card ai-pulse" style="border-color: var(--gold-dim);" onclick="goToScreen('screen-cart-detail')">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-12">
+              <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,153,0,0.15);display:flex;align-items:center;justify-content:center;font-size:20px;">🛒</div>
+              <div>
+                <div style="font-weight:600; font-size:14px;">Amazon Cart</div>
+                <div class="text-xs text-dim" style="margin-top:2px;">3 items · 4 days ago</div>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-family:'Bebas Neue';font-size:22px;color:var(--gold);letter-spacing:1px;">$247.83</div>
+            </div>
+          </div>
+          <div style="margin-top:10px;padding:8px 12px;background:rgba(200,169,81,0.08);border-radius:8px;border-left:3px solid var(--gold);">
+            <div class="text-xs" style="color:var(--gold);font-weight:600;">★ AI NUDGE</div>
+            <div class="text-sm" style="margin-top:2px;">Price drop detected on 2 items. Save $34 if you buy today.</div>
+          </div>
+        </div>
+
+        <div class="card" onclick="goToScreen('screen-cart-detail')">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-12">
+              <div style="width:40px;height:40px;border-radius:10px;background:rgba(45,106,79,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;">🏔️</div>
+              <div>
+                <div style="font-weight:600; font-size:14px;">REI Cart</div>
+                <div class="text-xs text-dim" style="margin-top:2px;">2 items · 1 week ago</div>
+              </div>
+            </div>
+            <div style="font-family:'Bebas Neue';font-size:22px;color:var(--gold);letter-spacing:1px;">$134.99</div>
+          </div>
+        </div>
+
+        <!-- WISHLISTS -->
+        <div class="section-header" style="margin-top:8px;">
+          <h3>★ WISHLISTS</h3>
+        </div>
+        <div class="card">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-12">
+              <div style="width:40px;height:40px;border-radius:10px;background:rgba(200,169,81,0.12);display:flex;align-items:center;justify-content:center;font-size:20px;">🎁</div>
+              <div>
+                <div style="font-weight:600; font-size:14px;">Birthday Picks 2026</div>
+                <div class="text-xs text-dim" style="margin-top:2px;">8 items · 4 retailers</div>
+              </div>
+            </div>
+            <svg width="16" height="16" fill="var(--white-dim)" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+          </div>
+        </div>
+
+        <div style="height:24px;"></div>
+      </div>
+    </div>
+
+    <!-- ========== SCREEN 2: CART DETAIL ========== -->
+    <div class="screen" id="screen-cart-detail">
+      <div class="screen-content">
+        <div class="back-btn" onclick="goBack()">
+          <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          Back
+        </div>
+
+        <div class="flex items-center gap-12 mb-16">
+          <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,153,0,0.15);display:flex;align-items:center;justify-content:center;font-size:26px;">🛒</div>
+          <div>
+            <h2 style="font-size:24px;">AMAZON CART</h2>
+            <div class="text-sm text-dim">3 items · Last updated 4 days ago</div>
+          </div>
+        </div>
+
+        <!-- ITEMS -->
+        <div class="card">
+          <div class="cart-item">
+            <div class="cart-item-img" style="background:rgba(200,169,81,0.1);">🎧</div>
+            <div class="cart-item-info">
+              <div style="font-weight:600;font-size:13px;">Sony WH-1000XM5</div>
+              <div class="text-xs text-dim">Wireless Noise Cancelling</div>
+              <div style="display:flex;gap:8px;margin-top:4px;align-items:center;">
+                <span style="font-weight:700;color:var(--gold);">$278.00</span>
+                <span class="text-xs" style="text-decoration:line-through;color:var(--gray);">$349.99</span>
+                <span class="text-xs" style="color:#4ade80;font-weight:600;">★ -$72</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cart-item">
+            <div class="cart-item-img" style="background:rgba(42,79,160,0.15);">⌨️</div>
+            <div class="cart-item-info">
+              <div style="font-weight:600;font-size:13px;">Keychron K3 Pro</div>
+              <div class="text-xs text-dim">Low Profile Mechanical</div>
+              <div style="display:flex;gap:8px;margin-top:4px;align-items:center;">
+                <span style="font-weight:700;color:var(--gold);">$89.99</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cart-item">
+            <div class="cart-item-img" style="background:rgba(45,106,79,0.15);">🔌</div>
+            <div class="cart-item-info">
+              <div style="font-weight:600;font-size:13px;">Anker USB-C Hub</div>
+              <div class="text-xs text-dim">7-in-1 Adapter</div>
+              <div style="display:flex;gap:8px;margin-top:4px;align-items:center;">
+                <span style="font-weight:700;color:var(--gold);">$34.99</span>
+                <span class="text-xs" style="text-decoration:line-through;color:var(--gray);">$44.99</span>
+                <span class="text-xs" style="color:#4ade80;font-weight:600;">★ -$10</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRICE HISTORY CHART -->
+        <div class="section-header">
+          <h3>★ PRICE HISTORY</h3>
+          <span class="text-xs text-dim">Sony WH-1000XM5</span>
+        </div>
+        <div class="card">
+          <div class="chart-container">
+            <svg viewBox="0 0 320 110" preserveAspectRatio="none">
+              <!-- Grid lines -->
+              <line x1="0" y1="20" x2="320" y2="20" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+              <line x1="0" y1="50" x2="320" y2="50" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+              <line x1="0" y1="80" x2="320" y2="80" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+              <!-- Price labels -->
+              <text x="2" y="18" fill="rgba(255,255,255,0.3)" font-size="9">$350</text>
+              <text x="2" y="48" fill="rgba(255,255,255,0.3)" font-size="9">$300</text>
+              <text x="2" y="78" fill="rgba(255,255,255,0.3)" font-size="9">$250</text>
+              <!-- Area fill -->
+              <path d="M30,15 L80,20 L130,55 L180,50 L230,25 L280,60 L310,40 L310,105 L30,105 Z" fill="url(#goldGrad)" opacity="0.2"/>
+              <!-- Line -->
+              <polyline points="30,15 80,20 130,55 180,50 230,25 280,60 310,40" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Current price dot -->
+              <circle cx="310" cy="40" r="5" fill="var(--gold)"/>
+              <circle cx="310" cy="40" r="8" fill="var(--gold)" opacity="0.2"/>
+              <!-- Lowest dot -->
+              <circle cx="130" cy="55" r="4" fill="#4ade80"/>
+              <text x="120" y="70" fill="#4ade80" font-size="9" font-weight="600">$248</text>
+              <!-- Month labels -->
+              <text x="30" y="105" fill="rgba(255,255,255,0.3)" font-size="8">Oct</text>
+              <text x="105" y="105" fill="rgba(255,255,255,0.3)" font-size="8">Nov</text>
+              <text x="180" y="105" fill="rgba(255,255,255,0.3)" font-size="8">Dec</text>
+              <text x="255" y="105" fill="rgba(255,255,255,0.3)" font-size="8">Jan</text>
+              <text x="300" y="105" fill="rgba(255,255,255,0.3)" font-size="8">Now</text>
+              <defs>
+                <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--gold)" stop-opacity="0.4"/>
+                  <stop offset="100%" stop-color="var(--gold)" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+
+        <!-- AI PREDICTION -->
+        <div class="card" style="border-color:var(--gold-dim);">
+          <div class="flex items-center gap-12">
+            <svg class="confidence-ring" viewBox="0 0 52 52">
+              <circle cx="26" cy="26" r="22" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="4"/>
+              <circle cx="26" cy="26" r="22" fill="none" stroke="var(--gold)" stroke-width="4" stroke-dasharray="108 140" stroke-linecap="round" transform="rotate(-90 26 26)"/>
+              <text x="26" y="24" text-anchor="middle" fill="var(--gold)" font-family="Bebas Neue" font-size="14" letter-spacing="1">78%</text>
+              <text x="26" y="33" text-anchor="middle" fill="var(--white-dim)" font-size="6" letter-spacing="0.5">CONF.</text>
+            </svg>
+            <div style="flex:1;">
+              <div class="text-xs" style="color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:1px;">★ AI Price Prediction</div>
+              <div style="font-size:13px;margin-top:4px;line-height:1.4;">Cart total likely to <strong style="color:#4ade80;">drop $18-24</strong> within 5 days. Sony headphones trending down post-holiday.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EAGLE DIVIDER -->
+        <div class="eagle-divider">
+          <svg viewBox="0 0 24 24"><path d="M12 2L8 6H4l1.5 3L2 12l3.5 3L4 18h4l4 4 4-4h4l-1.5-3L22 12l-3.5-3L20 6h-4L12 2zm0 3.5L14.5 8H17l-.75 2L19 12l-2.75 2L17 16h-2.5L12 18.5 9.5 16H7l.75-2L5 12l2.75-2L7 8h2.5L12 5.5z"/></svg>
+        </div>
+
+        <!-- TOTAL + CTA -->
+        <div class="card" style="text-align:center;padding:20px;">
+          <div class="text-xs text-dim" style="text-transform:uppercase;letter-spacing:2px;">Cart Total</div>
+          <div style="font-family:'Bebas Neue';font-size:44px;color:var(--gold);letter-spacing:2px;margin:4px 0;">$247.83</div>
+          <div class="text-xs" style="color:#4ade80;margin-bottom:16px;">★ You're saving $82.00 from original prices</div>
+          <button class="btn btn-gold" style="width:100%;" onclick="alert('Purchase approved!')">
+            APPROVE PURCHASE — $247.83
+          </button>
+          <button class="btn btn-outline" style="width:100%;margin-top:8px;font-size:14px;">
+            WAIT FOR PRICE DROP
+          </button>
+        </div>
+
+        <div style="height:24px;"></div>
+      </div>
+    </div>
+
+    <!-- ========== SCREEN 3: RETAILER PROFILE (NIKE) ========== -->
+    <div class="screen" id="screen-retailer">
+      <div class="screen-content">
+        <div class="back-btn" onclick="goBack()">
+          <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          Back
+        </div>
+
+        <!-- RETAILER HEADER -->
+        <div class="flex items-center gap-16 mb-16">
+          <div style="width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--white)"><path d="M21 7c0-.73-.41-1.36-1.02-1.68L12 1 4.02 5.32C3.41 5.64 3 6.27 3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7z"/></svg>
+          </div>
+          <div style="flex:1;">
+            <h2 style="font-size:26px;">NIKE</h2>
+            <div class="text-sm text-dim">Connected since Jan 2025</div>
+          </div>
+          <!-- SHIELD BADGE -->
+          <div class="shield-badge">
+            <svg class="shield-svg" width="70" height="80" viewBox="0 0 70 80">
+              <path d="M35 2 L65 16 L65 40 Q65 62 35 78 Q5 62 5 40 L5 16 Z" fill="none" stroke="var(--gold)" stroke-width="2" opacity="0.6"/>
+              <path d="M35 8 L59 20 L59 40 Q59 58 35 72 Q11 58 11 40 L11 20 Z" fill="rgba(200,169,81,0.08)"/>
+            </svg>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);text-align:center;">
+              <div class="grade">A-</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TUEBOR TAGLINE -->
+        <div style="text-align:center;margin-bottom:20px;padding:10px;border:1px solid var(--border-card);border-radius:10px;background:rgba(200,169,81,0.04);">
+          <div style="font-family:'Bebas Neue';font-size:14px;letter-spacing:4px;color:var(--gold-dim);">TUEBOR — I WILL DEFEND</div>
+          <div class="text-xs text-dim" style="margin-top:4px;">Your shield score protects against bad deals & shady practices</div>
+        </div>
+
+        <!-- SHIELD BREAKDOWN -->
+        <div class="card">
+          <h3 style="font-size:14px;margin-bottom:14px;">★ SHIELD BREAKDOWN</h3>
+          <div class="score-bar-row">
+            <span class="score-bar-label">Pricing</span>
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:88%;background:var(--gold);"></div></div>
+            <span class="score-bar-val">88</span>
+          </div>
+          <div class="score-bar-row">
+            <span class="score-bar-label">Returns</span>
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:92%;background:var(--gold);"></div></div>
+            <span class="score-bar-val">92</span>
+          </div>
+          <div class="score-bar-row">
+            <span class="score-bar-label">Privacy</span>
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:75%;background:var(--gold-dim);"></div></div>
+            <span class="score-bar-val">75</span>
+          </div>
+          <div class="score-bar-row">
+            <span class="score-bar-label">Shipping</span>
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:94%;background:var(--gold);"></div></div>
+            <span class="score-bar-val">94</span>
+          </div>
+          <div class="score-bar-row">
+            <span class="score-bar-label">Sustainability</span>
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:70%;background:var(--green-light);"></div></div>
+            <span class="score-bar-val">70</span>
+          </div>
+        </div>
+
+        <!-- QUICK INFO CARDS -->
+        <div class="flex gap-8" style="margin-bottom:12px;">
+          <div class="card" style="flex:1;text-align:center;margin-bottom:0;">
+            <div class="text-xs text-dim" style="text-transform:uppercase;letter-spacing:1px;">Alias</div>
+            <div style="font-weight:600;font-size:14px;margin-top:4px;">gabi.s2847</div>
+          </div>
+          <div class="card" style="flex:1;text-align:center;margin-bottom:0;">
+            <div class="text-xs text-dim" style="text-transform:uppercase;letter-spacing:1px;">Wallet</div>
+            <div style="font-weight:600;font-size:14px;margin-top:4px;color:var(--gold);">$125.00</div>
+          </div>
+        </div>
+
+        <div class="flex gap-8">
+          <div class="card" style="flex:1;text-align:center;margin-bottom:0;">
+            <div class="text-xs text-dim" style="text-transform:uppercase;letter-spacing:1px;">Returns</div>
+            <div style="font-weight:600;font-size:14px;margin-top:4px;">30 Days</div>
+          </div>
+          <div class="card" style="flex:1;text-align:center;margin-bottom:0;">
+            <div class="text-xs text-dim" style="text-transform:uppercase;letter-spacing:1px;">Orders</div>
+            <div style="font-weight:600;font-size:14px;margin-top:4px;">12</div>
+          </div>
+        </div>
+
+        <!-- RECENT ORDERS -->
+        <div class="section-header" style="margin-top:20px;">
+          <h3>★ RECENT ORDERS</h3>
+        </div>
+        <div class="card">
+          <div class="cart-item">
+            <div class="cart-item-img" style="background:rgba(200,169,81,0.1);">👟</div>
+            <div class="cart-item-info">
+              <div style="font-weight:600;font-size:13px;">Air Max 90</div>
+              <div class="text-xs text-dim">Mar 5, 2026 · Arriving today</div>
+            </div>
+            <span style="font-weight:600;color:var(--gold);font-size:13px;">$134.99</span>
+          </div>
+          <div class="cart-item">
+            <div class="cart-item-img" style="background:rgba(42,79,160,0.15);">🧥</div>
+            <div class="cart-item-info">
+              <div style="font-weight:600;font-size:13px;">Tech Fleece Hoodie</div>
+              <div class="text-xs text-dim">Feb 18, 2026 · Delivered</div>
+            </div>
+            <span style="font-weight:600;color:var(--gold);font-size:13px;">$89.99</span>
+          </div>
+          <div class="cart-item">
+            <div class="cart-item-img" style="background:rgba(45,106,79,0.15);">👟</div>
+            <div class="cart-item-info">
+              <div style="font-weight:600;font-size:13px;">Dunk Low Retro</div>
+              <div class="text-xs text-dim">Jan 10, 2026 · Delivered</div>
+            </div>
+            <span style="font-weight:600;color:var(--gold);font-size:13px;">$109.99</span>
+          </div>
+        </div>
+
+        <div style="height:24px;"></div>
+      </div>
+    </div>
+
+    <!-- ========== SCREEN 4: INBOX ========== -->
+    <div class="screen" id="screen-inbox">
+      <div class="screen-content">
+        <h1 style="font-size:28px;margin-bottom:4px;">INBOX</h1>
+        <div class="text-sm text-dim" style="margin-bottom:16px;">Your shopping intelligence feed</div>
+
+        <div class="pill-tabs">
+          <div class="pill-tab active" onclick="switchInboxTab(this, 'inbox-tracking')">★ Tracking</div>
+          <div class="pill-tab" onclick="switchInboxTab(this, 'inbox-promos')">Promos</div>
+          <div class="pill-tab" onclick="switchInboxTab(this, 'inbox-blocked')">Blocked</div>
+        </div>
+
+        <!-- TRACKING TAB -->
+        <div class="inbox-tab-content" id="inbox-tracking">
+          <div class="card">
+            <div class="inbox-item">
+              <div class="inbox-dot"></div>
+              <div style="flex:1;">
+                <div class="flex items-center justify-between">
+                  <div style="font-weight:600;font-size:13px;">Nike — Out for Delivery</div>
+                  <div class="text-xs text-dim">2h ago</div>
+                </div>
+                <div class="text-sm text-dim" style="margin-top:2px;">Your Air Max 90 is on the truck in Philadelphia. ETA: Today by 6pm.</div>
+                <div class="tracking-status status-delivery" style="margin-top:6px;">★ Arriving Today</div>
+              </div>
+            </div>
+
+            <div class="inbox-item">
+              <div class="inbox-dot"></div>
+              <div style="flex:1;">
+                <div class="flex items-center justify-between">
+                  <div style="font-weight:600;font-size:13px;">Apple — In Transit</div>
+                  <div class="text-xs text-dim">6h ago</div>
+                </div>
+                <div class="text-sm text-dim" style="margin-top:2px;">MacBook Pro Charger departed Memphis sorting facility. Expected delivery: Mar 14.</div>
+                <div class="tracking-status status-transit" style="margin-top:6px;">In Transit</div>
+              </div>
+            </div>
+
+            <div class="inbox-item">
+              <div class="inbox-dot read"></div>
+              <div style="flex:1;">
+                <div class="flex items-center justify-between">
+                  <div style="font-weight:600;font-size:13px;">Glossier — Label Created</div>
+                  <div class="text-xs text-dim">1d ago</div>
+                </div>
+                <div class="text-sm text-dim" style="margin-top:2px;">Cloud Paint Set shipping label generated. Awaiting carrier pickup.</div>
+                <div class="tracking-status status-created" style="margin-top:6px;">Pending</div>
+              </div>
+            </div>
+
+            <div class="inbox-item">
+              <div class="inbox-dot read"></div>
+              <div style="flex:1;">
+                <div class="flex items-center justify-between">
+                  <div style="font-weight:600;font-size:13px;">Amazon — Delivered</div>
+                  <div class="text-xs text-dim">3d ago</div>
+                </div>
+                <div class="text-sm text-dim" style="margin-top:2px;">Your Anker Power Bank was delivered to your front door.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROMOS TAB -->
+        <div class="inbox-tab-content" id="inbox-promos" style="display:none;">
+          <div class="card">
+            <div class="inbox-item">
+              <div class="inbox-dot"></div>
+              <div style="flex:1;">
+                <div class="flex items-center justify-between">
+                  <div style="font-weight:600;font-size:13px;">Amazon Electronics Sale</div>
+                  <div class="text-xs gold">-32%</div>
+                </div>
+                <div class="text-sm text-dim" style="margin-top:2px;">Up to 32% off headphones, keyboards & accessories. Ends Mar 15.</div>
+                <div style="margin-top:6px;padding:6px 10px;background:rgba(200,169,81,0.08);border-radius:6px;display:inline-block;">
+                  <span class="text-xs" style="color:var(--gold);font-weight:600;">★ 2 cart items on sale</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="inbox-item">
+              <div class="inbox-dot"></div>
+              <div style="flex:1;">
+                <div class="flex items-center justify-between">
+                  <div style="font-weight:600;font-size:13px;">Nike Member Early Access</div>
+                  <div class="text-xs gold">-25%</div>
+                </div>
+                <div class="text-sm text-dim" style="margin-top:2px;">25% off select styles for Nike members. Code: EARLYSPRING25</div>
+              </div>
+            </div>
+
+            <div class="inbox-item">
+              <div class="inbox-dot read"></div>
+              <div style="flex:1;">
+                <div class="flex items-center justify-between">
+                  <div style="font-weight:600;font-size:13px;">REI Anniversary Sale</div>
+                  <div class="text-xs gold">-20%</div>
+                </div>
+                <div class="text-sm text-dim" style="margin-top:2px;">20% off one full-price item + up to 30% off select gear.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOCKED TAB -->
+        <div class="inbox-tab-content" id="inbox-blocked" style="display:none;">
+          <div class="card">
+            <div class="inbox-item">
+              <div style="width:8px;height:8px;border-radius:50;background:var(--red);flex-shrink:0;margin-top:6px;"></div>
+              <div style="flex:1;">
+                <div class="flex items-center justify-between">
+                  <div style="font-weight:600;font-size:13px;color:var(--white-dim);text-decoration:line-through;">Shein Newsletter</div>
+                  <div class="text-xs text-dim">Blocked</div>
+                </div>
+                <div class="text-xs text-dim" style="margin-top:2px;">47 emails blocked this month</div>
+              </div>
+            </div>
+
+            <div class="inbox-item">
+              <div style="width:8px;height:8px;border-radius:50;background:var(--red);flex-shrink:0;margin-top:6px;"></div>
+              <div style="flex:1;">
+                <div class="flex items-center justify-between">
+                  <div style="font-weight:600;font-size:13px;color:var(--white-dim);text-decoration:line-through;">Temu Daily Deals</div>
+                  <div class="text-xs text-dim">Blocked</div>
+                </div>
+                <div class="text-xs text-dim" style="margin-top:2px;">112 emails blocked this month</div>
+              </div>
+            </div>
+
+            <div class="inbox-item">
+              <div style="width:8px;height:8px;border-radius:50;background:var(--red);flex-shrink:0;margin-top:6px;"></div>
+              <div style="flex:1;">
+                <div class="flex items-center justify-between">
+                  <div style="font-weight:600;font-size:13px;color:var(--white-dim);text-decoration:line-through;">Wish Promotions</div>
+                  <div class="text-xs text-dim">Blocked</div>
+                </div>
+                <div class="text-xs text-dim" style="margin-top:2px;">23 emails blocked this month</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="text-align:center;margin-top:16px;padding:12px;border:1px dashed var(--border-card);border-radius:12px;">
+            <div class="text-sm text-dim">182 spam emails blocked this month</div>
+            <div style="font-family:'Bebas Neue';font-size:20px;color:var(--gold);letter-spacing:2px;margin-top:4px;">TUEBOR</div>
+          </div>
+        </div>
+
+        <div style="height:24px;"></div>
+      </div>
+    </div>
+
+    <!-- ========== SCREEN 5: WALLET ========== -->
+    <div class="screen" id="screen-wallet">
+      <div class="screen-content">
+        <h1 style="font-size:28px;margin-bottom:16px;">WALLET</h1>
+
+        <!-- TOTAL BALANCE WITH MICHIGAN WATERMARK -->
+        <div class="card" style="text-align:center;padding:28px 20px;position:relative;overflow:hidden;">
+          <!-- Subtle Michigan outline behind balance -->
+          <svg style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:140px;height:200px;opacity:0.04;" viewBox="0 0 200 300" fill="white">
+            <path d="M20,80 Q25,70 40,68 Q55,60 70,62 Q85,58 95,65 Q105,60 115,63 Q125,58 135,65 Q140,70 138,78 Q130,85 120,82 Q110,88 95,85 Q80,90 65,85 Q50,88 40,83 Q30,88 20,80Z" opacity="0.8"/>
+            <path d="M60,100 Q65,95 80,93 Q95,88 110,95 Q125,90 135,100 Q140,115 142,130 Q145,150 140,170 Q138,185 130,200 Q125,210 115,218 Q105,225 95,220 Q85,225 75,218 Q65,210 60,195 Q55,180 58,160 Q55,140 58,120 Q57,110 60,100Z" opacity="0.8"/>
+          </svg>
+          <div class="text-xs text-dim" style="text-transform:uppercase;letter-spacing:3px;position:relative;">Total Balance</div>
+          <div style="font-family:'Bebas Neue';font-size:56px;color:var(--gold);letter-spacing:3px;margin:8px 0;position:relative;">$725.00</div>
+          <div class="text-xs text-dim" style="position:relative;">Across 4 retailer wallets</div>
+          <div style="display:flex;gap:8px;margin-top:16px;justify-content:center;position:relative;">
+            <button class="btn btn-gold" style="padding:10px 24px;font-size:14px;">ADD FUNDS</button>
+            <button class="btn btn-outline" style="padding:10px 24px;font-size:14px;">TRANSFER</button>
+          </div>
+        </div>
+
+        <!-- RETAILER WALLETS -->
+        <div class="section-header">
+          <h3>★ RETAILER WALLETS</h3>
+        </div>
+        <div class="card">
+          <div class="wallet-retailer" onclick="goToScreen('screen-retailer')">
+            <div class="flex items-center gap-12">
+              <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,153,0,0.15);display:flex;align-items:center;justify-content:center;font-size:20px;">🛒</div>
+              <div>
+                <div style="font-weight:600;font-size:14px;">Amazon</div>
+                <div class="text-xs text-dim">Gift card balance</div>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-family:'Bebas Neue';font-size:20px;color:var(--gold);letter-spacing:1px;">$350.00</div>
+            </div>
+          </div>
+
+          <div class="wallet-retailer" onclick="goToScreen('screen-retailer')">
+            <div class="flex items-center gap-12">
+              <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:20px;">✓</div>
+              <div>
+                <div style="font-weight:600;font-size:14px;">Nike</div>
+                <div class="text-xs text-dim">Store credit + gift card</div>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-family:'Bebas Neue';font-size:20px;color:var(--gold);letter-spacing:1px;">$125.00</div>
+            </div>
+          </div>
+
+          <div class="wallet-retailer">
+            <div class="flex items-center gap-12">
+              <div style="width:40px;height:40px;border-radius:10px;background:rgba(200,169,81,0.12);display:flex;align-items:center;justify-content:center;font-size:20px;">🍎</div>
+              <div>
+                <div style="font-weight:600;font-size:14px;">Apple</div>
+                <div class="text-xs text-dim">Apple ID balance</div>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-family:'Bebas Neue';font-size:20px;color:var(--gold);letter-spacing:1px;">$200.00</div>
+            </div>
+          </div>
+
+          <div class="wallet-retailer">
+            <div class="flex items-center gap-12">
+              <div style="width:40px;height:40px;border-radius:10px;background:rgba(45,106,79,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;">🏔️</div>
+              <div>
+                <div style="font-weight:600;font-size:14px;">REI</div>
+                <div class="text-xs text-dim">Member dividend</div>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-family:'Bebas Neue';font-size:20px;color:var(--gold);letter-spacing:1px;">$50.00</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECENT TRANSACTIONS -->
+        <div class="section-header">
+          <h3>★ RECENT TRANSACTIONS</h3>
+        </div>
+        <div class="card">
+          <div class="transaction">
+            <div class="flex items-center gap-12">
+              <div style="width:32px;height:32px;border-radius:8px;background:rgba(74,222,128,0.1);display:flex;align-items:center;justify-content:center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#4ade80"><path d="M7 14l5-5 5 5H7z"/></svg>
+              </div>
+              <div>
+                <div style="font-weight:600;font-size:13px;">Cashback — Amazon</div>
+                <div class="text-xs text-dim">Mar 8, 2026</div>
+              </div>
+            </div>
+            <div style="color:#4ade80;font-weight:600;font-size:13px;">+$12.50</div>
+          </div>
+
+          <div class="transaction">
+            <div class="flex items-center gap-12">
+              <div style="width:32px;height:32px;border-radius:8px;background:rgba(239,68,68,0.1);display:flex;align-items:center;justify-content:center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#ef4444"><path d="M7 10l5 5 5-5H7z"/></svg>
+              </div>
+              <div>
+                <div style="font-weight:600;font-size:13px;">Nike — Air Max 90</div>
+                <div class="text-xs text-dim">Mar 5, 2026</div>
+              </div>
+            </div>
+            <div style="color:var(--white);font-weight:600;font-size:13px;">-$134.99</div>
+          </div>
+
+          <div class="transaction">
+            <div class="flex items-center gap-12">
+              <div style="width:32px;height:32px;border-radius:8px;background:rgba(74,222,128,0.1);display:flex;align-items:center;justify-content:center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#4ade80"><path d="M7 14l5-5 5 5H7z"/></svg>
+              </div>
+              <div>
+                <div style="font-weight:600;font-size:13px;">Gift Card — Apple</div>
+                <div class="text-xs text-dim">Mar 1, 2026</div>
+              </div>
+            </div>
+            <div style="color:#4ade80;font-weight:600;font-size:13px;">+$200.00</div>
+          </div>
+
+          <div class="transaction">
+            <div class="flex items-center gap-12">
+              <div style="width:32px;height:32px;border-radius:8px;background:rgba(239,68,68,0.1);display:flex;align-items:center;justify-content:center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#ef4444"><path d="M7 10l5 5 5-5H7z"/></svg>
+              </div>
+              <div>
+                <div style="font-weight:600;font-size:13px;">Amazon — Anker Power Bank</div>
+                <div class="text-xs text-dim">Feb 28, 2026</div>
+              </div>
+            </div>
+            <div style="color:var(--white);font-weight:600;font-size:13px;">-$29.99</div>
+          </div>
+        </div>
+
+        <!-- SAVINGS SUMMARY -->
+        <div class="card" style="background:linear-gradient(135deg, rgba(200,169,81,0.1), rgba(27,67,50,0.1));border-color:var(--gold-dim);">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-xs" style="color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:1px;">★ Total Savings 2026</div>
+              <div style="font-family:'Bebas Neue';font-size:32px;color:var(--gold);letter-spacing:2px;">$482.30</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="text-xs text-dim">Across 24 orders</div>
+              <div class="text-sm" style="color:#4ade80;font-weight:600;margin-top:2px;">↑ 18% vs last year</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:24px;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="navigate('screen-home', this)">
+      <div class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      </div>
+      <span>Home</span>
+    </div>
+    <div class="nav-item" onclick="navigate('screen-cart-detail', this)">
+      <div class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0020 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        <div class="badge">2</div>
+      </div>
+      <span>Carts</span>
+    </div>
+    <div class="nav-item" onclick="navigate('screen-inbox', this)">
+      <div class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        <div class="badge">5</div>
+      </div>
+      <span>Inbox</span>
+    </div>
+    <div class="nav-item" onclick="navigate('screen-wallet', this)">
+      <div class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h14c1.1 0 2 .9 2 2v1h-9a2 2 0 00-2 2v8a2 2 0 002 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+      </div>
+      <span>Wallet</span>
+    </div>
+  </div>
+
+  <div class="home-indicator"></div>
+</div>
+
+<script>
+// Navigation state
+let history = ['screen-home'];
+let currentScreen = 'screen-home';
+
+function navigate(screenId, navItem) {
+  if (screenId === currentScreen) return;
+
+  // Update nav active state
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  navItem.classList.add('active');
+
+  // Transition screens
+  const current = document.getElementById(currentScreen);
+  const next = document.getElementById(screenId);
+
+  current.classList.remove('active');
+  current.classList.add('slide-left');
+  setTimeout(() => current.classList.remove('slide-left'), 300);
+
+  next.classList.add('active');
+
+  currentScreen = screenId;
+  history = [screenId];
+}
+
+function goToScreen(screenId) {
+  if (screenId === currentScreen) return;
+
+  const current = document.getElementById(currentScreen);
+  const next = document.getElementById(screenId);
+
+  current.classList.remove('active');
+  current.classList.add('slide-left');
+  setTimeout(() => current.classList.remove('slide-left'), 300);
+
+  next.classList.add('active');
+
+  history.push(screenId);
+  currentScreen = screenId;
+}
+
+function goBack() {
+  if (history.length <= 1) return;
+
+  const current = document.getElementById(currentScreen);
+  history.pop();
+  const prevId = history[history.length - 1];
+  const prev = document.getElementById(prevId);
+
+  current.classList.remove('active');
+  prev.classList.add('active');
+
+  currentScreen = prevId;
+
+  // Update nav highlight
+  const navMap = {
+    'screen-home': 0,
+    'screen-cart-detail': 1,
+    'screen-inbox': 2,
+    'screen-wallet': 3,
+    'screen-retailer': 0
+  };
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(n => n.classList.remove('active'));
+  navItems[navMap[prevId] || 0].classList.add('active');
+}
+
+function switchInboxTab(tab, contentId) {
+  // Update tab styling
+  document.querySelectorAll('.pill-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+
+  // Show/hide content
+  document.querySelectorAll('.inbox-tab-content').forEach(c => c.style.display = 'none');
+  document.getElementById(contentId).style.display = 'block';
+}
+</script>
+
+</body>
+</html>

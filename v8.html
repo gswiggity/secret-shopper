@@ -1,0 +1,2494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secret Shopper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-body: #000000;
+  --bg-primary: #0a0a0c;
+  --bg-card: #1a1a22;
+  --bg-card-hover: #22222e;
+  --bg-elevated: #252530;
+  --gold: #d4a853;
+  --gold-bright: #e0bd6a;
+  --gold-dim: rgba(212, 168, 83, 0.15);
+  --gold-border: rgba(212, 168, 83, 0.15);
+  --teal: #4ecdc4;
+  --teal-dim: rgba(78, 205, 196, 0.12);
+  --sienna: #ff6b6b;
+  --sienna-dim: rgba(255, 107, 107, 0.12);
+  --violet: #a78bfa;
+  --violet-dim: rgba(167, 139, 250, 0.12);
+  --text-primary: #f0efe8;
+  --text-secondary: #8b8a95;
+  --text-muted: #5a596a;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg-body);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.iphone-frame {
+  width: 393px;
+  height: 852px;
+  background: var(--bg-primary);
+  border-radius: 50px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 0 3px #1a1a22, 0 0 0 6px #0a0a0c, 0 20px 60px rgba(0,0,0,0.8);
+}
+
+/* Diagonal pinstripe background */
+.iphone-frame::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 8px,
+    rgba(212, 168, 83, 0.02) 8px,
+    rgba(212, 168, 83, 0.02) 9px
+  );
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Dynamic Island */
+.dynamic-island {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 126px;
+  height: 36px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 100;
+}
+
+/* Status Bar */
+.status-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 32px 8px;
+  z-index: 90;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: -apple-system, sans-serif;
+}
+
+.status-bar .time { font-size: 16px; font-weight: 700; }
+.status-bar .icons { display: flex; gap: 6px; align-items: center; }
+.status-bar .icons svg { width: 18px; height: 14px; fill: var(--text-primary); }
+
+/* Extension connected badge in status bar */
+.extension-badge {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--teal-dim);
+  border: 1px solid rgba(78,205,196,0.3);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 8px;
+  color: var(--teal);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: 0.5px;
+}
+.extension-badge svg { width: 10px; height: 10px; fill: var(--teal); }
+
+/* Bottom Nav */
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 88px;
+  background: linear-gradient(to top, var(--bg-primary) 60%, rgba(10,10,12,0.95));
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding-top: 10px;
+  z-index: 90;
+  border-top: 1px solid var(--border);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px 12px;
+}
+
+.nav-item svg { width: 24px; height: 24px; stroke: var(--text-muted); fill: none; stroke-width: 1.5; transition: all 0.2s; }
+.nav-item span { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; }
+.nav-item.active svg { stroke: var(--gold); }
+.nav-item.active span { color: var(--gold); }
+
+/* Home Indicator */
+.home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  background: rgba(240, 239, 232, 0.2);
+  border-radius: 3px;
+  z-index: 100;
+}
+
+/* Screen container */
+.screen-area {
+  position: absolute;
+  top: 56px;
+  left: 0;
+  right: 0;
+  bottom: 88px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 1;
+  scrollbar-width: none;
+}
+.screen-area::-webkit-scrollbar { display: none; }
+
+.screen {
+  display: none;
+  padding: 16px 20px 20px;
+  min-height: 100%;
+}
+.screen.active { display: block; }
+
+/* Animation */
+.screen.active .anim-child {
+  animation: fadeUp 0.35s ease forwards;
+  opacity: 0;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.anim-child:nth-child(1) { animation-delay: 0s; }
+.anim-child:nth-child(2) { animation-delay: 0.04s; }
+.anim-child:nth-child(3) { animation-delay: 0.08s; }
+.anim-child:nth-child(4) { animation-delay: 0.12s; }
+.anim-child:nth-child(5) { animation-delay: 0.16s; }
+.anim-child:nth-child(6) { animation-delay: 0.2s; }
+.anim-child:nth-child(7) { animation-delay: 0.24s; }
+.anim-child:nth-child(8) { animation-delay: 0.28s; }
+.anim-child:nth-child(9) { animation-delay: 0.32s; }
+.anim-child:nth-child(10) { animation-delay: 0.36s; }
+.anim-child:nth-child(11) { animation-delay: 0.4s; }
+.anim-child:nth-child(12) { animation-delay: 0.44s; }
+
+/* Typography */
+h1.display { font-family: 'Syne', sans-serif; color: var(--gold); font-size: 28px; letter-spacing: 3px; font-weight: 400; }
+h2.display { font-family: 'Syne', sans-serif; color: var(--text-primary); font-size: 22px; letter-spacing: 2px; font-weight: 400; }
+h3.section-head { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold-dim);
+  transition: all 0.2s;
+  position: relative;
+}
+.card:hover, .card.interactive:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  border-left-color: var(--gold);
+}
+.card.interactive { cursor: pointer; }
+
+/* Tags/Badges */
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: 0.5px;
+}
+.tag-gold { background: var(--gold-dim); color: var(--gold); }
+.tag-teal { background: var(--teal-dim); color: var(--teal); }
+.tag-sienna { background: var(--sienna-dim); color: var(--sienna); }
+.tag-violet { background: var(--violet-dim); color: var(--violet); }
+
+/* Progress bars */
+.progress-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 6px 0;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+.progress-fill.teal { background: var(--teal); }
+.progress-fill.gold { background: var(--gold); }
+
+/* Brand icon circles */
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* Buttons */
+.btn-primary {
+  flex: 1;
+  padding: 16px;
+  background: var(--gold);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 12px;
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-primary:hover {
+  background: var(--gold-bright);
+  box-shadow: 0 0 24px rgba(212, 168, 83, 0.3);
+}
+
+.btn-outline {
+  flex: 1;
+  padding: 16px;
+  background: transparent;
+  color: var(--teal);
+  border: 2px solid var(--teal);
+  border-radius: 12px;
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-outline:hover {
+  background: var(--teal-dim);
+  box-shadow: 0 0 16px rgba(78, 205, 196, 0.2);
+}
+
+.btn-secondary {
+  padding: 10px 16px;
+  background: var(--bg-elevated);
+  color: var(--gold);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-secondary:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  margin-bottom: 16px;
+  padding: 4px 0;
+}
+.back-btn svg { width: 16px; height: 16px; stroke: var(--gold); fill: none; stroke-width: 2; }
+
+/* Scrollbar hidden on horizontal scrolls */
+.hscroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.hscroll::-webkit-scrollbar { display: none; }
+
+/* Tab styles */
+.tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 16px;
+  border-bottom: 2px solid var(--border);
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+}
+.tab-btn.active { color: var(--gold); }
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gold);
+  border-radius: 2px 2px 0 0;
+}
+.tab-btn .dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--sienna);
+  border-radius: 50%;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Michigan watermark */
+.michigan-watermark {
+  position: absolute;
+  opacity: 0.06;
+  pointer-events: none;
+}
+
+/* Stamp badge */
+.stamp-badge {
+  display: inline-block;
+  border: 3px solid var(--sienna);
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  color: var(--sienna);
+  letter-spacing: 3px;
+  transform: rotate(-3deg);
+  opacity: 0.9;
+}
+
+/* ====== ONBOARDING SCREEN ====== */
+
+.onboard-hero {
+  text-align: center;
+  padding: 20px 0 24px;
+}
+.onboard-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 38px;
+  color: var(--gold);
+  letter-spacing: 5px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.onboard-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.onboard-steps {
+  margin-bottom: 24px;
+}
+.onboard-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px;
+  margin-bottom: 10px;
+}
+.step-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--gold-dim);
+  border: 2px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+.step-content { flex: 1; }
+.step-title {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.step-desc {
+  font-size: 10px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.step-demo-alias {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 10px;
+  background: var(--teal-dim);
+  border: 1px solid rgba(78,205,196,0.2);
+  border-radius: 4px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  color: var(--teal);
+}
+.step-demo-ext {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 4px 10px;
+  background: var(--violet-dim);
+  border: 1px solid rgba(167,139,250,0.2);
+  border-radius: 4px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  color: var(--violet);
+}
+
+.btn-onboard {
+  width: 100%;
+  padding: 18px;
+  background: var(--gold);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 14px;
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 12px;
+}
+.btn-onboard:hover {
+  background: var(--gold-bright);
+  box-shadow: 0 0 24px rgba(212, 168, 83, 0.3);
+}
+
+.powered-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 0;
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+.powered-badge span {
+  color: var(--text-secondary);
+}
+
+/* ====== SCREEN 1: DASHBOARD ====== */
+
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+.dash-greeting {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.dash-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 30px;
+  color: var(--gold);
+  letter-spacing: 4px;
+  line-height: 1;
+}
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 2px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  color: var(--gold);
+}
+
+/* Extension connected badge on dashboard */
+.ext-connected {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--teal-dim);
+  border: 1px solid rgba(78,205,196,0.2);
+  border-radius: 4px;
+  font-size: 9px;
+  color: var(--teal);
+  margin-top: 6px;
+}
+.ext-connected .dot-live {
+  width: 5px;
+  height: 5px;
+  background: var(--teal);
+  border-radius: 50%;
+  animation: pulse-dot 2s ease infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.shipment-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.shipment-row:last-child { border-bottom: none; }
+.shipment-info { flex: 1; min-width: 0; }
+.shipment-brand { font-size: 13px; color: var(--text-primary); font-weight: 700; }
+.shipment-status { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+.shipment-eta { font-size: 10px; color: var(--text-muted); text-align: right; white-space: nowrap; }
+.shipment-eta strong { color: var(--text-secondary); display: block; }
+
+/* Brand chips */
+.brand-chip {
+  padding: 8px 16px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  flex-shrink: 0;
+  min-width: 90px;
+}
+.brand-chip:hover { background: var(--bg-card-hover); border-color: var(--border-hover); }
+.brand-chip .chip-name {
+  font-size: 11px;
+  color: var(--gold);
+  margin-bottom: 3px;
+}
+.brand-chip .chip-status {
+  font-size: 9px;
+  color: var(--text-muted);
+}
+.brand-chip .chip-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  background: var(--sienna);
+  border-radius: 50%;
+  font-size: 10px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deal-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.deal-card:last-child { border-bottom: none; }
+.deal-info { flex: 1; }
+.deal-brand { font-size: 12px; color: var(--text-primary); font-weight: 700; }
+.deal-desc { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+.deal-badge {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.cold-case-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+.cold-case-info { flex: 1; }
+.cold-case-brand { font-size: 13px; color: var(--text-primary); font-weight: 700; }
+.cold-case-meta { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+.cold-case-amount { font-size: 14px; color: var(--text-primary); font-weight: 700; text-align: right; }
+
+.ai-nudge {
+  background: var(--violet-dim);
+  border-left: 3px solid var(--violet);
+  border-radius: 0 8px 8px 0;
+  padding: 8px 12px;
+  font-size: 10px;
+  color: var(--violet);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+/* How It Works collapsible */
+.how-it-works {
+  margin-bottom: 12px;
+}
+.hiw-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--gold-border);
+  border-left: 3px solid var(--gold);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.hiw-toggle:hover { background: var(--bg-card-hover); }
+.hiw-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hiw-toggle-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  color: var(--gold);
+  letter-spacing: 2px;
+}
+.hiw-toggle-icon {
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: transform 0.3s;
+}
+.hiw-toggle.open .hiw-toggle-icon { transform: rotate(180deg); }
+
+.hiw-content {
+  display: none;
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  margin-top: -12px;
+  padding-top: 20px;
+}
+.hiw-content.open { display: block; }
+
+.hiw-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.hiw-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+.hiw-step-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.hiw-step-text {
+  font-size: 11px;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+.hiw-step-sub {
+  font-size: 9px;
+  color: var(--text-secondary);
+  margin-top: 1px;
+}
+.hiw-arrow {
+  width: 28px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 10px;
+  padding: 2px 0;
+}
+
+/* ====== SCREEN 2: CART DETAIL ====== */
+
+.cart-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.cart-subtitle {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.cart-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  background: var(--bg-elevated);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+.cart-item-emoji {
+  width: 44px;
+  height: 44px;
+  background: var(--bg-card);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.cart-item-info { flex: 1; }
+.cart-item-name { font-size: 12px; color: var(--text-primary); font-weight: 700; }
+.cart-item-price { font-size: 11px; color: var(--text-secondary); margin-top: 2px; font-family: 'Plus Jakarta Sans', sans-serif; }
+.cart-item-price .was { text-decoration: line-through; color: var(--text-muted); margin-right: 6px; }
+.cart-item-tag { flex-shrink: 0; }
+
+.chart-container {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold-dim);
+}
+.chart-container svg { width: 100%; height: auto; }
+
+.legal-brief {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--violet);
+}
+.legal-brief-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.legal-brief-header span {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  color: var(--violet);
+  letter-spacing: 2px;
+}
+.legal-brief p {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.confidence-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.confidence-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.confidence-fill {
+  height: 100%;
+  background: var(--violet);
+  border-radius: 3px;
+}
+.confidence-label {
+  font-size: 12px;
+  color: var(--violet);
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.wallet-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--gold-dim);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  border: 1px solid var(--gold-border);
+}
+.wallet-strip-label { font-size: 11px; color: var(--text-secondary); }
+.wallet-strip-amount { font-size: 16px; color: var(--gold); font-weight: 700; font-family: 'Syne', sans-serif; letter-spacing: 1px; }
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.btn-approve-sub { font-size: 10px; color: var(--text-muted); text-align: center; margin-top: 8px; }
+
+/* Purchase confirmation overlay */
+.confirm-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+}
+.confirm-backdrop {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(5, 10, 24, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.confirm-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border-radius: 24px 24px 0 0;
+  padding: 28px 24px 40px;
+  border-top: 1px solid var(--gold-border);
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.confirm-overlay.active .confirm-sheet {
+  transform: translateY(0);
+}
+.confirm-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  color: var(--gold);
+  letter-spacing: 3px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.confirm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.confirm-row:last-of-type { border-bottom: none; }
+.confirm-label { color: var(--text-secondary); }
+.confirm-value { color: var(--text-primary); font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; }
+.confirm-value.remaining { color: var(--teal); }
+.confirm-faceid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 18px;
+  background: var(--gold);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 14px;
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.2s;
+}
+.confirm-faceid:hover {
+  background: var(--gold-bright);
+  box-shadow: 0 0 24px rgba(212, 168, 83, 0.3);
+}
+.confirm-faceid-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+.confirm-cancel {
+  display: block;
+  margin: 14px auto 0;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 16px;
+}
+.confirm-cancel:hover { color: var(--text-primary); }
+
+/* Purchase success state */
+.confirm-success {
+  display: none;
+  text-align: center;
+  padding: 20px 0;
+}
+.confirm-success.active { display: block; }
+.success-check {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--teal-dim);
+  border: 3px solid var(--teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 32px;
+  animation: scaleIn 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes scaleIn {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+.success-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px;
+  color: var(--teal);
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+}
+.success-detail {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 4px;
+}
+.success-remaining {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  color: var(--gold);
+  letter-spacing: 2px;
+  margin-top: 12px;
+}
+.success-sub {
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ====== SCREEN 3: RETAILER PROFILE ====== */
+
+.profile-hero {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.profile-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 32px;
+  color: #fff;
+}
+.profile-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 32px;
+  color: var(--text-primary);
+  letter-spacing: 4px;
+}
+.profile-url {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.shield-score-card {
+  text-align: center;
+  padding: 24px 16px;
+  margin-bottom: 12px;
+}
+.shield-grade {
+  font-family: 'Syne', sans-serif;
+  font-size: 64px;
+  color: var(--gold);
+  line-height: 1;
+}
+.shield-motto {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 9px;
+  color: var(--text-secondary);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.shield-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.shield-cell {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 8px;
+  text-align: center;
+}
+.shield-cell-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.shield-cell-value {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.alias-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+}
+.alias-email {
+  flex: 1;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  color: var(--teal);
+  word-break: break-all;
+}
+.copy-btn {
+  padding: 6px 12px;
+  background: var(--teal-dim);
+  border: 1px solid rgba(78,205,196,0.2);
+  border-radius: 6px;
+  color: var(--teal);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.return-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.return-item:last-child { border-bottom: none; }
+.return-name { font-size: 12px; color: var(--text-primary); }
+.return-date { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.return-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.return-action-btn {
+  padding: 4px 10px;
+  background: none;
+  border: 1px solid rgba(78,205,196,0.3);
+  border-radius: 4px;
+  color: var(--teal);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 9px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.return-action-btn:hover {
+  background: var(--teal-dim);
+  border-color: var(--teal);
+}
+
+.order-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.order-row:last-child { border-bottom: none; }
+.order-id { font-size: 11px; color: var(--text-secondary); }
+.order-amount { font-size: 12px; color: var(--text-primary); font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+/* ====== SCREEN 4: INBOX ====== */
+
+.inbox-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.inbox-badge {
+  padding: 2px 10px;
+  background: var(--sienna-dim);
+  color: var(--sienna);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  border-radius: 10px;
+}
+
+/* Alert cards */
+.alert-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold-dim);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+.alert-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  border-left-color: var(--gold);
+}
+.alert-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  width: 28px;
+  text-align: center;
+  padding-top: 2px;
+}
+.alert-body {
+  flex: 1;
+  min-width: 0;
+}
+.alert-desc {
+  font-size: 11px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+.alert-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.alert-action {
+  padding: 4px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--gold);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 9px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.alert-action:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+}
+
+.email-item {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.email-item:last-child { border-bottom: none; }
+.email-from {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.email-sender { font-size: 12px; color: var(--text-primary); font-weight: 700; }
+.email-time { font-size: 10px; color: var(--text-muted); }
+.email-subject { font-size: 11px; color: var(--text-secondary); margin-bottom: 8px; }
+.email-tags { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+.promo-code-box {
+  border: 2px dashed var(--gold);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  background: var(--gold-dim);
+}
+.promo-code {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px;
+  color: var(--gold);
+  letter-spacing: 3px;
+}
+.promo-detail {
+  text-align: right;
+}
+.promo-discount { font-size: 12px; color: var(--text-primary); font-weight: 700; }
+.promo-exp { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
+.promo-apply {
+  margin-top: 4px;
+  padding: 4px 12px;
+  background: var(--gold);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 4px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.promo-apply:hover {
+  background: var(--gold-bright);
+  box-shadow: 0 0 16px rgba(201,168,76,0.3);
+}
+
+.apply-cart-btn {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 14px;
+  background: var(--gold-dim);
+  border: 1px solid var(--gold-border);
+  border-radius: 6px;
+  color: var(--gold);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.apply-cart-btn:hover {
+  background: var(--gold);
+  color: var(--bg-primary);
+}
+
+.blocked-big {
+  text-align: center;
+  padding: 20px 0;
+}
+.blocked-count {
+  font-family: 'Syne', sans-serif;
+  font-size: 64px;
+  color: var(--sienna);
+  line-height: 1;
+}
+.blocked-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  color: var(--text-secondary);
+  letter-spacing: 2px;
+  margin-top: 4px;
+}
+
+.blocked-email {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  opacity: 0.5;
+}
+
+/* ====== SCREEN 5: WALLET ====== */
+
+.wallet-hero {
+  text-align: center;
+  padding: 28px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.wallet-hero .michigan-watermark {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 160px;
+}
+.wallet-label {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  color: var(--text-secondary);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.wallet-total {
+  font-family: 'Syne', sans-serif;
+  font-size: 56px;
+  color: var(--gold);
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+}
+.wallet-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.wallet-trust {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 10px;
+  position: relative;
+  z-index: 2;
+}
+
+.wallet-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.wallet-action-btn {
+  flex: 1;
+  padding: 12px 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--gold);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.wallet-action-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+}
+
+.retainer-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.retainer-item:last-child { border-bottom: none; }
+.retainer-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.retainer-name { font-size: 13px; color: var(--text-primary); font-weight: 700; }
+.retainer-meta { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.retainer-amount { font-size: 16px; color: var(--gold); font-family: 'Syne', sans-serif; letter-spacing: 1px; }
+
+.savings-card {
+  text-align: center;
+  padding: 24px 16px;
+}
+.savings-amount {
+  font-family: 'Syne', sans-serif;
+  font-size: 36px;
+  color: var(--gold);
+  letter-spacing: 2px;
+  line-height: 1;
+}
+.savings-sub {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.ledger-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.ledger-item:last-child { border-bottom: none; }
+.ledger-desc { font-size: 12px; color: var(--text-primary); }
+.ledger-date { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.ledger-amount { font-size: 14px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; }
+.ledger-amount.debit { color: var(--text-primary); }
+.ledger-amount.credit { color: var(--teal); }
+
+/* Utility */
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.mb-4 { margin-bottom: 4px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-12 { margin-bottom: 12px; }
+.mb-16 { margin-bottom: 16px; }
+.mb-20 { margin-bottom: 20px; }
+.mb-24 { margin-bottom: 24px; }
+.mt-8 { margin-top: 8px; }
+.view-all {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  color: var(--gold);
+  cursor: pointer;
+  background: none;
+  border: none;
+  letter-spacing: 1px;
+}
+
+.wishlist-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.wishlist-name { font-size: 13px; color: var(--text-primary); font-weight: 700; }
+.wishlist-meta { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.share-btn {
+  padding: 6px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+/* Toast notification */
+.toast {
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: var(--teal);
+  color: var(--bg-primary);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 10px;
+  z-index: 300;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(78, 205, 196, 0.4);
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+</style>
+</head>
+<body>
+
+<div class="iphone-frame">
+  <div class="dynamic-island"></div>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="icons">
+      <div class="extension-badge">
+        <svg viewBox="0 0 16 16"><path d="M13 3H3a1 1 0 00-1 1v8a1 1 0 001 1h10a1 1 0 001-1V4a1 1 0 00-1-1zm-5 8a3 3 0 110-6 3 3 0 010 6z"/></svg>
+        EXT
+      </div>
+      <svg viewBox="0 0 18 14"><path d="M1 10C3.5 7 6.5 5.5 9 5.5S14.5 7 17 10" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M4 12.5C5.5 11 7.2 10 9 10s3.5 1 5 2.5" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="9" cy="14" r="1" fill="currentColor"/></svg>
+      <svg viewBox="0 0 18 14"><rect x="1" y="2" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2" fill="none"/><rect x="3" y="4.5" width="2.5" height="5" fill="currentColor" opacity="0.4"/><rect x="6" y="3.5" width="2.5" height="6" fill="currentColor" opacity="0.6"/><rect x="9" y="2.5" width="2.5" height="7" fill="currentColor"/><path d="M15 6v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Screen Area -->
+  <div class="screen-area">
+
+    <!-- ===== ONBOARDING SCREEN ===== -->
+    <div class="screen active" id="screen-onboarding">
+
+      <div class="onboard-hero anim-child">
+        <div class="onboard-logo">SECRET SHOPPER</div>
+        <div class="onboard-sub">Your AI agent between you and every retailer. One alias, one wallet, zero spam.</div>
+      </div>
+
+      <div class="onboard-steps">
+        <div class="card onboard-step anim-child">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Connect a Retailer</div>
+            <div class="step-desc">Pick a store. We generate a unique alias email just for them.</div>
+            <div class="step-demo-alias">gabi.xk7m@secretshopper.me</div>
+          </div>
+        </div>
+
+        <div class="card onboard-step anim-child">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">Fund Your Wallet</div>
+            <div class="step-desc">Load a capped amount per retailer. The agent can't spend more than what's there.</div>
+          </div>
+        </div>
+
+        <div class="card onboard-step anim-child">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <div class="step-title">Install the Extension</div>
+            <div class="step-desc">Our Chrome extension auto-fills aliases and catches promos as you browse.</div>
+            <div class="step-demo-ext">
+              <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor"><path d="M13 3H3a1 1 0 00-1 1v8a1 1 0 001 1h10a1 1 0 001-1V4a1 1 0 00-1-1zm-5 8a3 3 0 110-6 3 3 0 010 6z"/></svg>
+              Chrome Extension
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="anim-child">
+        <button class="btn-onboard" onclick="navigateTo('dashboard')">LET'S GO</button>
+        <div class="powered-badge">
+          Powered by <span>existing tech</span> &#8212; alias engine + virtual cards already in market
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== SCREEN 1: DASHBOARD ===== -->
+    <div class="screen" id="screen-dashboard">
+
+      <div class="dash-header anim-child">
+        <div>
+          <div class="dash-greeting">Good evening, Counselor</div>
+          <div class="dash-title">SECRET SHOPPER</div>
+          <div class="ext-connected">
+            <span class="dot-live"></span>
+            Extension connected
+          </div>
+        </div>
+        <div class="avatar">GS</div>
+      </div>
+
+      <!-- HOW IT WORKS (collapsible) -->
+      <div class="anim-child how-it-works">
+        <div class="hiw-toggle" id="hiwToggle" onclick="toggleHIW()">
+          <div class="hiw-toggle-left">
+            <span style="font-size:14px;">&#9878;</span>
+            <span class="hiw-toggle-label">HOW IT WORKS</span>
+          </div>
+          <span class="hiw-toggle-icon">&#9660;</span>
+        </div>
+        <div class="hiw-content" id="hiwContent">
+          <div class="hiw-flow">
+            <div class="hiw-step">
+              <div class="hiw-step-icon" style="background:var(--gold-dim);">&#128270;</div>
+              <div><div class="hiw-step-text">Browse</div><div class="hiw-step-sub">Shop anywhere online</div></div>
+            </div>
+            <div class="hiw-arrow">&#8595;</div>
+            <div class="hiw-step">
+              <div class="hiw-step-icon" style="background:var(--teal-dim);">&#128231;</div>
+              <div><div class="hiw-step-text">Alias</div><div class="hiw-step-sub">Unique email per retailer</div></div>
+            </div>
+            <div class="hiw-arrow">&#8595;</div>
+            <div class="hiw-step">
+              <div class="hiw-step-icon" style="background:var(--violet-dim);">&#128065;</div>
+              <div><div class="hiw-step-text">Monitor</div><div class="hiw-step-sub">Track carts, prices, returns</div></div>
+            </div>
+            <div class="hiw-arrow">&#8595;</div>
+            <div class="hiw-step">
+              <div class="hiw-step-icon" style="background:var(--violet-dim);">&#129504;</div>
+              <div><div class="hiw-step-text">Predict</div><div class="hiw-step-sub">AI forecasts promos & drops</div></div>
+            </div>
+            <div class="hiw-arrow">&#8595;</div>
+            <div class="hiw-step">
+              <div class="hiw-step-icon" style="background:var(--gold-dim);">&#128176;</div>
+              <div><div class="hiw-step-text">Buy</div><div class="hiw-step-sub">Capped wallet checkout</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IN TRANSIT -->
+      <div class="anim-child">
+        <h3 class="section-head">&#9733; IN TRANSIT</h3>
+        <div class="card">
+          <!-- Nike — now shows pending order, not just delivered -->
+          <div class="shipment-row" onclick="navigateTo('retailer')" style="cursor:pointer;">
+            <div class="brand-icon" style="background:#f47520;">N</div>
+            <div class="shipment-info">
+              <div class="shipment-brand">Nike</div>
+              <div class="shipment-status">Out for delivery &middot; Philadelphia, PA</div>
+              <div class="progress-track"><div class="progress-fill teal" style="width:92%;"></div></div>
+            </div>
+            <div class="shipment-eta"><strong>Today, 8pm</strong>ETA</div>
+          </div>
+          <!-- Apple — consistent story: AirPods Pro in transit -->
+          <div class="shipment-row">
+            <div class="brand-icon" style="background:#555;">A</div>
+            <div class="shipment-info">
+              <div class="shipment-brand">Apple</div>
+              <div class="shipment-status">In transit &middot; AirPods Pro &middot; Memphis, TN</div>
+              <div class="progress-track"><div class="progress-fill teal" style="width:60%;"></div></div>
+            </div>
+            <div class="shipment-eta"><strong>Mar 14</strong>ETA</div>
+          </div>
+          <!-- Glossier -->
+          <div class="shipment-row">
+            <div class="brand-icon" style="background:#f5c6d0; color:#333;">G</div>
+            <div class="shipment-info">
+              <div class="shipment-brand">Glossier</div>
+              <div class="shipment-status">Label created</div>
+              <div class="progress-track"><div class="progress-fill gold" style="width:12%;"></div></div>
+            </div>
+            <div class="shipment-eta"><strong>Mar 17</strong>ETA</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLD CASES -->
+      <div class="anim-child">
+        <h3 class="section-head">&#9733; COLD CASES</h3>
+        <div class="card interactive" onclick="navigateTo('cart')">
+          <div class="cold-case-card">
+            <div class="cold-case-info">
+              <div class="cold-case-brand">Amazon</div>
+              <div class="cold-case-meta">3 items &middot; Abandoned 3 days ago</div>
+            </div>
+            <div class="cold-case-amount" style="font-family:'Space Mono',monospace;">$247.83</div>
+          </div>
+          <div class="ai-nudge">&#9878; Promo likely in 2 days &mdash; Amazon sends codes after 5-day abandon</div>
+        </div>
+        <div class="card">
+          <div class="cold-case-card">
+            <div class="cold-case-info">
+              <div class="cold-case-brand">REI</div>
+              <div class="cold-case-meta">1 item &middot; Abandoned 7 days ago</div>
+            </div>
+            <div class="cold-case-amount" style="font-family:'Space Mono',monospace;">$134.99</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BRANDS ROW -->
+      <div class="anim-child mb-16">
+        <h3 class="section-head">&#9733; BRANDS</h3>
+        <div class="hscroll">
+          <div class="brand-chip" onclick="navigateTo('retailer')">
+            <div class="chip-name">Nike</div>
+            <div class="chip-status" style="color:var(--teal);">Arriving today</div>
+          </div>
+          <div class="brand-chip">
+            <div class="chip-name">Apple</div>
+            <div class="chip-status" style="color:var(--teal);">In transit</div>
+          </div>
+          <div class="brand-chip" style="position:relative;" onclick="navigateTo('cart')">
+            <div class="chip-name">Amazon</div>
+            <div class="chip-status" style="color:var(--gold);">Cart: $248</div>
+            <span class="chip-badge">2</span>
+          </div>
+          <div class="brand-chip">
+            <div class="chip-name">Glossier</div>
+            <div class="chip-status" style="color:var(--teal);">Shipping soon</div>
+          </div>
+          <div class="brand-chip">
+            <div class="chip-name">REI</div>
+            <div class="chip-status" style="color:var(--gold);">Promo ready</div>
+          </div>
+          <div class="brand-chip">
+            <div class="chip-name">Patagonia</div>
+            <div class="chip-status">&nbsp;</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXHIBITS (Deals) -->
+      <div class="anim-child">
+        <div class="flex-between mb-12">
+          <h3 class="section-head" style="margin-bottom:0;">&#9733; EXHIBITS</h3>
+          <button class="view-all" onclick="navigateTo('inbox'); switchTab('promos');">View all</button>
+        </div>
+        <div class="card">
+          <div class="deal-card">
+            <div class="brand-icon" style="background:#ff9900; width:28px; height:28px; font-size:13px;">A</div>
+            <div class="deal-info">
+              <div class="deal-brand">Amazon</div>
+              <div class="deal-desc">Lightning deal on AirPods Max</div>
+            </div>
+            <div class="deal-badge">-32%</div>
+          </div>
+          <div class="deal-card">
+            <div class="brand-icon" style="background:#f47520; width:28px; height:28px; font-size:13px;">N</div>
+            <div class="deal-info">
+              <div class="deal-brand">Nike</div>
+              <div class="deal-desc">Member exclusive 25% off clearance</div>
+            </div>
+            <div class="deal-badge">25%</div>
+          </div>
+          <div class="deal-card">
+            <div class="brand-icon" style="background:#4a7c59; width:28px; height:28px; font-size:13px;">R</div>
+            <div class="deal-info">
+              <div class="deal-brand">REI</div>
+              <div class="deal-desc">Anniversary sale 20%</div>
+            </div>
+            <div class="deal-badge">20%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WISHLISTS -->
+      <div class="anim-child">
+        <h3 class="section-head">&#9733; WISHLISTS</h3>
+        <div class="card">
+          <div class="wishlist-card">
+            <div class="wishlist-info">
+              <div class="wishlist-name">Birthday Picks 2026</div>
+              <div class="wishlist-meta">7 items</div>
+            </div>
+            <button class="share-btn">Share</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== SCREEN 2: CART DETAIL ===== -->
+    <div class="screen" id="screen-cart">
+
+      <button class="back-btn anim-child" onclick="navigateTo('dashboard')">
+        <svg viewBox="0 0 16 16"><path d="M10 3L5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back
+      </button>
+
+      <div class="cart-header-brand anim-child">
+        <div class="brand-icon" style="background:#ff9900;">A</div>
+        <h2 class="display" style="font-size:22px; letter-spacing:2px;">CASE FILE: AMAZON CART</h2>
+      </div>
+      <div class="cart-subtitle anim-child">3 items &middot; Abandoned 3 days ago &middot; Case opened Mar 8</div>
+
+      <!-- Promo applied banner (hidden by default) -->
+      <div class="anim-child" id="promoAppliedBanner" style="display:none;">
+        <div style="background:var(--teal-dim); border:1px solid rgba(78,205,196,0.3); border-radius:10px; padding:12px 16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:11px; color:var(--teal); font-weight:700;">COMEBACK10 Applied</div>
+            <div style="font-size:10px; color:var(--text-secondary); margin-top:2px;">10% off &mdash; saving $24.78</div>
+          </div>
+          <span class="tag tag-teal">&#10003; Active</span>
+        </div>
+      </div>
+
+      <!-- Cart Items -->
+      <div class="anim-child">
+        <div class="cart-item">
+          <div class="cart-item-emoji">&#127911;</div>
+          <div class="cart-item-info">
+            <div class="cart-item-name">Sony WH-1000XM5</div>
+            <div class="cart-item-price"><span class="was">$399.99</span> $328.00</div>
+          </div>
+          <div class="cart-item-tag"><span class="tag tag-teal">&#8595;$72</span></div>
+        </div>
+        <div class="cart-item">
+          <div class="cart-item-emoji">&#128268;</div>
+          <div class="cart-item-info">
+            <div class="cart-item-name">Anker USB-C Hub 7-in-1</div>
+            <div class="cart-item-price">$34.99</div>
+          </div>
+          <div class="cart-item-tag"></div>
+        </div>
+        <div class="cart-item">
+          <div class="cart-item-emoji">&#128218;</div>
+          <div class="cart-item-info">
+            <div class="cart-item-name">Designing Data-Intensive Apps</div>
+            <div class="cart-item-price"><span class="was">$44.99</span> $33.36</div>
+          </div>
+          <div class="cart-item-tag"></div>
+        </div>
+      </div>
+
+      <!-- Price History Chart -->
+      <div class="anim-child">
+        <h3 class="section-head mt-8">&#9733; PRICE HISTORY</h3>
+        <div class="chart-container">
+          <svg viewBox="0 0 320 120" preserveAspectRatio="xMidYMid meet">
+            <!-- Grid lines -->
+            <line x1="0" y1="20" x2="320" y2="20" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="0" y1="50" x2="320" y2="50" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="0" y1="80" x2="320" y2="80" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <!-- Labels -->
+            <text x="0" y="115" fill="#4a4740" font-size="9" font-family="Space Mono">Oct</text>
+            <text x="60" y="115" fill="#4a4740" font-size="9" font-family="Space Mono">Nov</text>
+            <text x="120" y="115" fill="#4a4740" font-size="9" font-family="Space Mono">Dec</text>
+            <text x="180" y="115" fill="#4a4740" font-size="9" font-family="Space Mono">Jan</text>
+            <text x="240" y="115" fill="#4a4740" font-size="9" font-family="Space Mono">Feb</text>
+            <text x="300" y="115" fill="#4a4740" font-size="9" font-family="Space Mono">Mar</text>
+            <!-- Price labels -->
+            <text x="290" y="18" fill="#4a4740" font-size="8" font-family="Space Mono">$399</text>
+            <text x="290" y="76" fill="#2a9d8f" font-size="8" font-family="Space Mono" font-weight="700">$328</text>
+            <!-- Area fill -->
+            <path d="M0,60 L53,55 L107,40 L160,20 L213,50 L267,55 L320,70 L320,100 L0,100Z" fill="rgba(201,168,76,0.08)"/>
+            <!-- Line -->
+            <path d="M0,60 L53,55 L107,40 L160,20 L213,50 L267,55 L320,70" fill="none" stroke="#2a9d8f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Peak dot -->
+            <circle cx="160" cy="20" r="4" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
+            <text x="145" y="14" fill="#c9a84c" font-size="8" font-family="Space Mono">Peak</text>
+            <!-- Current dot -->
+            <circle cx="320" cy="70" r="4" fill="#2a9d8f"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- AI Legal Brief -->
+      <div class="anim-child">
+        <div class="legal-brief">
+          <div class="legal-brief-header">
+            <span style="font-size:16px;">&#9878;</span>
+            <span>AGENT PREDICTION</span>
+          </div>
+          <p>Amazon typically sends a 10-15% promo code after 5 days of cart abandonment for electronics. You're at day 3. Wait 2 more days for a likely code worth ~$33-49 off.</p>
+          <div class="confidence-bar">
+            <span style="font-size:10px; color: var(--text-muted);">Confidence</span>
+            <div class="confidence-track"><div class="confidence-fill" style="width:78%;"></div></div>
+            <span class="confidence-label">78%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Purchase -->
+      <div class="anim-child">
+        <div class="wallet-strip">
+          <span class="wallet-strip-label">Amazon Wallet</span>
+          <span class="wallet-strip-amount">$400.00</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" id="btnApprove" onclick="showConfirmation()">APPROVE $247.83</button>
+          <button class="btn-outline">WAIT FOR DROP</button>
+        </div>
+        <div class="btn-approve-sub">Pays from wallet &middot; alias checkout</div>
+      </div>
+
+    </div>
+
+    <!-- ===== SCREEN 3: RETAILER PROFILE ===== -->
+    <div class="screen" id="screen-retailer">
+
+      <button class="back-btn anim-child" onclick="navigateTo('dashboard')">
+        <svg viewBox="0 0 16 16"><path d="M10 3L5 8l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back
+      </button>
+
+      <div class="profile-hero anim-child">
+        <div class="profile-icon" style="background:#f47520;">N</div>
+        <div class="profile-name">NIKE</div>
+        <div class="profile-url">nike.com</div>
+      </div>
+
+      <!-- Shield Score -->
+      <div class="anim-child">
+        <div class="card shield-score-card">
+          <div class="shield-grade">A-</div>
+          <div class="shield-motto">TUEBOR &mdash; I WILL DEFEND</div>
+        </div>
+      </div>
+
+      <div class="anim-child">
+        <div class="shield-grid">
+          <div class="shield-cell">
+            <div class="shield-cell-label">Email Spam</div>
+            <div class="shield-cell-value" style="color: var(--teal);">Low</div>
+          </div>
+          <div class="shield-cell">
+            <div class="shield-cell-label">Data Sharing</div>
+            <div class="shield-cell-value" style="color: var(--gold);">Med</div>
+          </div>
+          <div class="shield-cell">
+            <div class="shield-cell-label">Dark Patterns</div>
+            <div class="shield-cell-value" style="color: var(--teal);">None</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email Alias -->
+      <div class="anim-child">
+        <h3 class="section-head">&#9733; EMAIL ALIAS</h3>
+        <div class="card alias-card">
+          <span class="alias-email">gabi.xk7m@secretshopper.me</span>
+          <button class="copy-btn" id="copyBtn" onclick="copyAlias(this)">Copy</button>
+        </div>
+      </div>
+
+      <!-- Powered by badge -->
+      <div class="anim-child">
+        <div style="text-align:center; padding:4px 0 12px; font-size:9px; color:var(--text-muted); letter-spacing:1px;">
+          Alias powered by <span style="color:var(--text-secondary);">existing infrastructure</span> &middot; Virtual card ready
+        </div>
+      </div>
+
+      <!-- Wallet -->
+      <div class="anim-child">
+        <h3 class="section-head">&#9733; WALLET</h3>
+        <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--gold); letter-spacing:2px;">$150.00</span>
+          <button class="btn-secondary">Add Funds</button>
+        </div>
+      </div>
+
+      <!-- Return Windows -->
+      <div class="anim-child">
+        <h3 class="section-head">&#9733; RETURN WINDOWS</h3>
+        <div class="card">
+          <div class="return-item">
+            <div>
+              <div class="return-name">Air Max 90</div>
+              <div class="return-date">Return by Mar 15</div>
+            </div>
+            <div class="return-actions">
+              <span class="tag tag-sienna">4 days left</span>
+              <button class="return-action-btn">Start Return</button>
+            </div>
+          </div>
+          <div class="return-item">
+            <div>
+              <div class="return-name">Dri-FIT Tee</div>
+              <div class="return-date">Return by Apr 2</div>
+            </div>
+            <div class="return-actions">
+              <span class="tag tag-teal">22 days left</span>
+              <button class="return-action-btn">Start Return</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order History — Nike now shows pending + delivered for consistency -->
+      <div class="anim-child">
+        <h3 class="section-head">&#9733; ORDER HISTORY</h3>
+        <div class="card">
+          <div class="order-row">
+            <div>
+              <div class="order-id">#NK-9201</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="tag tag-gold">Out for delivery</span>
+              <span class="order-amount">$89.00</span>
+            </div>
+          </div>
+          <div class="order-row">
+            <div>
+              <div class="order-id">#NK-9012</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="tag tag-teal">Delivered</span>
+              <span class="order-amount">$42.00</span>
+            </div>
+          </div>
+          <div class="order-row">
+            <div>
+              <div class="order-id">#NK-8834</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="tag tag-teal">Delivered</span>
+              <span class="order-amount">$129.99</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== SCREEN 4: INBOX ===== -->
+    <div class="screen" id="screen-inbox">
+
+      <div class="inbox-header anim-child">
+        <h1 class="display">INBOX</h1>
+        <span class="inbox-badge">5 new</span>
+      </div>
+
+      <div class="anim-child">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab('alerts')">Alerts<span class="dot"></span></button>
+          <button class="tab-btn" onclick="switchTab('promos')">Promos<span class="dot"></span></button>
+          <button class="tab-btn" onclick="switchTab('blocked')">Blocked</button>
+        </div>
+      </div>
+
+      <!-- ALERTS TAB -->
+      <div class="tab-content active anim-child" id="tab-alerts">
+        <!-- Price drop -->
+        <div class="alert-card">
+          <div class="alert-icon">&#128184;</div>
+          <div class="alert-body">
+            <div class="alert-desc">Sony WH-1000XM5 dropped $72 &mdash; now $328</div>
+            <div class="alert-meta">
+              <span class="tag tag-teal">Price Drop</span>
+            </div>
+          </div>
+          <button class="alert-action" onclick="navigateTo('cart')">View Cart</button>
+        </div>
+        <!-- Return deadline -->
+        <div class="alert-card">
+          <div class="alert-icon">&#9200;</div>
+          <div class="alert-body">
+            <div class="alert-desc">Air Max 90 return window closes in 4 days</div>
+            <div class="alert-meta">
+              <span class="tag tag-sienna">Return</span>
+            </div>
+          </div>
+          <button class="alert-action">Start Return</button>
+        </div>
+        <!-- AI prediction -->
+        <div class="alert-card">
+          <div class="alert-icon">&#9878;</div>
+          <div class="alert-body">
+            <div class="alert-desc">Amazon promo predicted in ~2 days for your cart</div>
+            <div class="alert-meta">
+              <span class="tag tag-violet">AI Insight</span>
+            </div>
+          </div>
+          <button class="alert-action" onclick="navigateTo('cart')">View Cart</button>
+        </div>
+        <!-- Wallet alert -->
+        <div class="alert-card">
+          <div class="alert-icon">&#128176;</div>
+          <div class="alert-body">
+            <div class="alert-desc">REI wallet ($50) won't cover cart ($134.99)</div>
+            <div class="alert-meta">
+              <span class="tag tag-sienna">Low Balance</span>
+            </div>
+          </div>
+          <button class="alert-action">Add Funds</button>
+        </div>
+      </div>
+
+      <!-- PROMOS TAB -->
+      <div class="tab-content anim-child" id="tab-promos">
+        <div class="promo-code-box">
+          <div>
+            <div class="promo-code">SAVE25</div>
+            <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">Nike &middot; 25% off</div>
+          </div>
+          <div class="promo-detail">
+            <div class="promo-exp">Exp Mar 15</div>
+            <button class="promo-apply" onclick="applyPromo('SAVE25', 'Nike cart', '$24.78')">Apply</button>
+          </div>
+        </div>
+        <div class="promo-code-box">
+          <div>
+            <div class="promo-code">SPRING15</div>
+            <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">REI &middot; 15% off</div>
+          </div>
+          <div class="promo-detail">
+            <div class="promo-exp">Exp Mar 20</div>
+            <button class="promo-apply" onclick="applyPromo('SPRING15', 'REI cart', '$20.25')">Apply</button>
+          </div>
+        </div>
+        <!-- Amazon COMEBACK10 -->
+        <div class="email-item">
+          <div class="email-from">
+            <span class="email-sender">Amazon</span>
+            <span class="email-time">1d ago</span>
+          </div>
+          <div class="email-subject">Still thinking about it? 10% off</div>
+          <div class="email-tags">
+            <span class="tag tag-gold">Code: COMEBACK10</span>
+            <span class="tag tag-violet">AI predicted this</span>
+          </div>
+          <button class="apply-cart-btn" onclick="applyPromoToCart()">Apply to Cart &rarr;</button>
+        </div>
+        <div class="email-item">
+          <div class="email-from">
+            <span class="email-sender">Glossier</span>
+            <span class="email-time">2d ago</span>
+          </div>
+          <div class="email-subject">Free shipping on your next order</div>
+          <div class="email-tags">
+            <span class="tag tag-gold">Promo</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOCKED TAB -->
+      <div class="tab-content anim-child" id="tab-blocked">
+        <div class="blocked-big">
+          <div class="blocked-count">47</div>
+          <div class="blocked-label">EMAILS BLOCKED THIS MONTH</div>
+          <div style="margin-top:16px;">
+            <span class="stamp-badge">OBJECTION SUSTAINED</span>
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <div class="blocked-email">
+            <span class="blocked-sender">Nike &mdash; Customer survey</span>
+            <span class="tag tag-sienna" style="opacity:0.6;">Survey</span>
+          </div>
+          <div class="blocked-email">
+            <span class="blocked-sender">Amazon &mdash; Deals of the day</span>
+            <span class="tag tag-sienna" style="opacity:0.6;">Marketing</span>
+          </div>
+          <div class="blocked-email">
+            <span class="blocked-sender">Glossier &mdash; New arrivals</span>
+            <span class="tag tag-sienna" style="opacity:0.6;">Marketing</span>
+          </div>
+          <div class="blocked-email">
+            <span class="blocked-sender">REI &mdash; Weekly newsletter</span>
+            <span class="tag tag-sienna" style="opacity:0.6;">Newsletter</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== SCREEN 5: WALLET ===== -->
+    <div class="screen" id="screen-wallet">
+
+      <div class="anim-child">
+        <div class="wallet-hero card" style="border-left:none;">
+          <!-- Michigan watermark -->
+          <svg class="michigan-watermark" viewBox="0 0 120 100" style="width:180px;height:140px;top:50%;left:50%;transform:translate(-50%,-50%);">
+            <path d="M55,45 L60,20 L65,15 L72,18 L78,12 L85,15 L90,10 L95,18 L98,15 L95,30 L90,45 L85,42 L80,48 L75,42 L70,50 L65,45 L60,48Z" fill="var(--gold)" opacity="0.08"/>
+            <path d="M40,60 L50,55 L60,52 L70,55 L75,60 L80,58 L85,62 L80,70 L70,75 L60,78 L50,72 L42,68Z" fill="var(--gold)" opacity="0.08"/>
+          </svg>
+          <div class="wallet-label">TOTAL BALANCE</div>
+          <div class="wallet-total">$725.00</div>
+          <div class="wallet-sub">Across 4 retailer wallets</div>
+          <div class="wallet-trust">&#128274; Your agent can only spend what's loaded. No surprises.</div>
+        </div>
+      </div>
+
+      <div class="anim-child">
+        <div class="wallet-actions">
+          <button class="wallet-action-btn">+ Add Funds</button>
+          <button class="wallet-action-btn">Transfer</button>
+          <button class="wallet-action-btn">History</button>
+        </div>
+      </div>
+
+      <!-- Retainer Accounts -->
+      <div class="anim-child">
+        <h3 class="section-head">&#9733; RETAINER ACCOUNTS</h3>
+        <div class="card">
+          <div class="retainer-item">
+            <div class="retainer-left">
+              <div class="brand-icon" style="background:#ff9900; width:32px; height:32px; font-size:14px;">A</div>
+              <div>
+                <div class="retainer-name">Amazon</div>
+                <div class="retainer-meta">Last used 3 days ago</div>
+              </div>
+            </div>
+            <div class="retainer-amount">$400.00</div>
+          </div>
+          <div class="retainer-item">
+            <div class="retainer-left">
+              <div class="brand-icon" style="background:#f47520; width:32px; height:32px; font-size:14px;">N</div>
+              <div>
+                <div class="retainer-name">Nike</div>
+                <div class="retainer-meta">Last used 12 days ago</div>
+              </div>
+            </div>
+            <div class="retainer-amount">$150.00</div>
+          </div>
+          <div class="retainer-item">
+            <div class="retainer-left">
+              <div class="brand-icon" style="background:#555; width:32px; height:32px; font-size:14px;">A</div>
+              <div>
+                <div class="retainer-name">Apple</div>
+                <div class="retainer-meta">Pending &mdash; AirPods Pro</div>
+              </div>
+            </div>
+            <div class="retainer-amount">$125.00</div>
+          </div>
+          <div class="retainer-item">
+            <div class="retainer-left">
+              <div class="brand-icon" style="background:#4a7c59; width:32px; height:32px; font-size:14px;">R</div>
+              <div>
+                <div class="retainer-name">REI</div>
+                <div class="retainer-meta">Cart waiting &mdash; $134.99</div>
+              </div>
+            </div>
+            <div class="retainer-amount">$50.00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Savings Summary -->
+      <div class="anim-child">
+        <h3 class="section-head">&#9733; SAVINGS</h3>
+        <div class="card savings-card">
+          <div class="savings-amount">$482.30 SAVED THIS YEAR</div>
+          <div class="savings-sub">Through price drops, promo codes, and patience</div>
+        </div>
+      </div>
+
+      <!-- The Ledger -->
+      <div class="anim-child">
+        <h3 class="section-head">&#9733; THE LEDGER</h3>
+        <div class="card">
+          <div class="ledger-item">
+            <div>
+              <div class="ledger-desc">Nike Dri-FIT Tee</div>
+              <div class="ledger-date">Mar 2</div>
+            </div>
+            <div class="ledger-amount debit">-$42.00</div>
+          </div>
+          <div class="ledger-item">
+            <div>
+              <div class="ledger-desc">Amazon Wallet Top-up</div>
+              <div class="ledger-date">Feb 28</div>
+            </div>
+            <div class="ledger-amount credit">+$400.00</div>
+          </div>
+          <div class="ledger-item">
+            <div>
+              <div class="ledger-desc">Nike Air Max 90</div>
+              <div class="ledger-date">Feb 18</div>
+            </div>
+            <div class="ledger-amount debit">-$129.99</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Purchase Confirmation Overlay -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-backdrop" onclick="hideConfirmation()"></div>
+    <div class="confirm-sheet">
+      <!-- Pre-confirmation state -->
+      <div id="confirmPreState">
+        <div class="confirm-title">CONFIRM PURCHASE</div>
+        <div class="confirm-row">
+          <span class="confirm-label">Items</span>
+          <span class="confirm-value">3 items from Amazon</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-label">Alias</span>
+          <span class="confirm-value" style="font-size:10px;">gabi.amz9@secretshopper.me</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-label">Wallet</span>
+          <span class="confirm-value">Amazon &mdash; $400.00</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-label">Total</span>
+          <span class="confirm-value">$247.83</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-label">Remaining</span>
+          <span class="confirm-value remaining">$152.17</span>
+        </div>
+        <button class="confirm-faceid" onclick="confirmPurchase()">
+          <span class="confirm-faceid-icon">&#128566;</span>
+          CONFIRM WITH FACE ID
+        </button>
+        <button class="confirm-cancel" onclick="hideConfirmation()">Cancel</button>
+      </div>
+
+      <!-- Success state (hidden initially) -->
+      <div class="confirm-success" id="confirmSuccessState">
+        <div class="success-check">&#10003;</div>
+        <div class="success-title">PURCHASE CONFIRMED</div>
+        <div class="success-detail">3 items from Amazon</div>
+        <div class="success-detail">Paid via alias: gabi.amz9@secretshopper.me</div>
+        <div class="success-detail" style="color:var(--text-primary); font-weight:700;">Total: $247.83</div>
+        <div class="success-remaining">$152.17 REMAINING</div>
+        <div class="success-sub">in Amazon wallet</div>
+        <button class="confirm-faceid" style="background:var(--teal); margin-top:24px;" onclick="hideConfirmation(); navigateTo('dashboard');">
+          BACK TO DASHBOARD
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="navigateTo('dashboard')" id="nav-dashboard">
+      <svg viewBox="0 0 24 24"><path d="M3 12l9-8 9 8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="nav-item" onclick="navigateTo('inbox')" id="nav-inbox">
+      <svg viewBox="0 0 24 24"><path d="M4 4h16v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 4l8 6 8-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Inbox</span>
+    </button>
+    <button class="nav-item" onclick="navigateTo('wallet')" id="nav-wallet">
+      <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="14" rx="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 10h20" stroke-linecap="round"/><circle cx="17" cy="14" r="1.5" fill="currentColor" stroke="none"/></svg>
+      <span>Wallet</span>
+    </button>
+  </div>
+
+  <div class="home-indicator"></div>
+</div>
+
+<script>
+function navigateTo(screenId) {
+  // Hide all screens
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+  });
+
+  // Map screen IDs
+  const screenMap = {
+    'onboarding': 'screen-onboarding',
+    'dashboard': 'screen-dashboard',
+    'cart': 'screen-cart',
+    'retailer': 'screen-retailer',
+    'inbox': 'screen-inbox',
+    'wallet': 'screen-wallet'
+  };
+
+  const target = document.getElementById(screenMap[screenId]);
+  if (target) {
+    target.classList.add('active');
+
+    // Re-trigger animations
+    target.querySelectorAll('.anim-child').forEach(el => {
+      el.style.animation = 'none';
+      el.offsetHeight; // force reflow
+      el.style.animation = '';
+    });
+  }
+
+  // Update nav active state
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navMap = {
+    'onboarding': 'nav-dashboard',
+    'dashboard': 'nav-dashboard',
+    'cart': 'nav-dashboard',
+    'retailer': 'nav-dashboard',
+    'inbox': 'nav-inbox',
+    'wallet': 'nav-wallet'
+  };
+  const navEl = document.getElementById(navMap[screenId]);
+  if (navEl) navEl.classList.add('active');
+
+  // Scroll to top
+  document.querySelector('.screen-area').scrollTop = 0;
+}
+
+function switchTab(tabId) {
+  // Update tab buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  const tabMap = { 'alerts': 0, 'promos': 1, 'blocked': 2 };
+  document.querySelectorAll('.tab-btn')[tabMap[tabId]].classList.add('active');
+
+  // Update tab content
+  document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+  document.getElementById('tab-' + tabId).classList.add('active');
+}
+
+function showConfirmation() {
+  const overlay = document.getElementById('confirmOverlay');
+  // Reset to pre-confirmation state
+  document.getElementById('confirmPreState').style.display = 'block';
+  document.getElementById('confirmSuccessState').classList.remove('active');
+  overlay.style.display = 'block';
+  requestAnimationFrame(() => {
+    overlay.classList.add('active');
+  });
+}
+
+function confirmPurchase() {
+  // Hide pre-state, show success
+  document.getElementById('confirmPreState').style.display = 'none';
+  const successEl = document.getElementById('confirmSuccessState');
+  successEl.classList.add('active');
+}
+
+function hideConfirmation() {
+  const overlay = document.getElementById('confirmOverlay');
+  overlay.classList.remove('active');
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    // Reset states
+    document.getElementById('confirmPreState').style.display = 'block';
+    document.getElementById('confirmSuccessState').classList.remove('active');
+  }, 350);
+}
+
+function copyAlias(btn) {
+  btn.textContent = 'Copied!';
+  setTimeout(() => {
+    btn.textContent = 'Copy';
+  }, 2000);
+}
+
+function toggleHIW() {
+  const toggle = document.getElementById('hiwToggle');
+  const content = document.getElementById('hiwContent');
+  toggle.classList.toggle('open');
+  content.classList.toggle('open');
+}
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 2500);
+}
+
+function applyPromo(code, cart, savings) {
+  showToast(code + ' applied — ' + savings + ' off');
+}
+
+function applyPromoToCart() {
+  // Show toast then navigate to cart with promo banner visible
+  showToast('COMEBACK10 applied — $24.78 off');
+  setTimeout(() => {
+    document.getElementById('promoAppliedBanner').style.display = 'block';
+    navigateTo('cart');
+  }, 600);
+}
+</script>
+
+</body>
+</html>

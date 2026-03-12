@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secret Shopper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: #0a0a0c;
+  --bg-secondary: #131318;
+  --bg-card: #1a1a22;
+  --bg-card-hover: #22222e;
+  --bg-elevated: #252530;
+  --text-primary: #f0efe8;
+  --text-secondary: #8b8a95;
+  --text-muted: #5a596a;
+  --accent-gold: #d4a853;
+  --accent-gold-dim: rgba(212, 168, 83, 0.15);
+  --accent-mint: #4ecdc4;
+  --accent-mint-dim: rgba(78, 205, 196, 0.12);
+  --accent-coral: #ff6b6b;
+  --accent-coral-dim: rgba(255, 107, 107, 0.12);
+  --accent-violet: #a78bfa;
+  --accent-violet-dim: rgba(167, 139, 250, 0.12);
+  --border: rgba(255, 255, 255, 0.06);
+  --border-light: rgba(255, 255, 255, 0.1);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: #000;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* iPhone Frame */
+.iphone-frame {
+  width: 393px;
+  height: 852px;
+  background: var(--bg-primary);
+  border-radius: 55px;
+  border: 3px solid #2a2a2a;
+  box-shadow: 0 0 0 1px #111, 0 30px 80px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.dynamic-island {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 126px;
+  height: 37px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 100;
+}
+
+.status-bar {
+  position: absolute;
+  top: 16px;
+  left: 36px;
+  right: 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 99;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.status-bar-right {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.battery {
+  width: 25px;
+  height: 12px;
+  border: 1.5px solid var(--text-primary);
+  border-radius: 3px;
+  position: relative;
+}
+.battery::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  top: 2px;
+  width: 2px;
+  height: 6px;
+  background: var(--text-primary);
+  border-radius: 0 1px 1px 0;
+}
+.battery-fill {
+  width: 75%;
+  height: 100%;
+  background: var(--text-primary);
+  border-radius: 1px;
+}
+
+.signal-bars {
+  display: flex;
+  gap: 1.5px;
+  align-items: flex-end;
+  height: 12px;
+}
+.signal-bar {
+  width: 3px;
+  background: var(--text-primary);
+  border-radius: 1px;
+}
+
+/* Screen Container */
+.screen-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 59px;
+  padding-bottom: 90px;
+}
+
+.screen {
+  display: none;
+  height: 100%;
+  overflow-y: auto;
+  padding: 0 20px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.screen::-webkit-scrollbar { display: none; }
+.screen.active { display: block; }
+
+/* Bottom Nav */
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 90px;
+  background: linear-gradient(to top, var(--bg-primary) 70%, transparent);
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding-top: 12px;
+  z-index: 50;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.2s;
+}
+
+.nav-item svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--text-muted);
+  fill: none;
+  stroke-width: 1.8;
+  transition: all 0.2s;
+}
+
+.nav-item span {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.nav-item.active svg { stroke: var(--accent-gold); }
+.nav-item.active span { color: var(--accent-gold); }
+
+.nav-item .nav-badge {
+  position: absolute;
+  top: -2px;
+  right: -6px;
+  width: 16px;
+  height: 16px;
+  background: var(--accent-coral);
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 700;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-icon-wrap {
+  position: relative;
+}
+
+/* Typography */
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 26px;
+  letter-spacing: -0.5px;
+}
+
+h2 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.3px;
+}
+
+h3 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.card:hover { background: var(--bg-card-hover); }
+
+/* Tags */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.tag-gold { background: var(--accent-gold-dim); color: var(--accent-gold); }
+.tag-mint { background: var(--accent-mint-dim); color: var(--accent-mint); }
+.tag-coral { background: var(--accent-coral-dim); color: var(--accent-coral); }
+.tag-violet { background: var(--accent-violet-dim); color: var(--accent-violet); }
+
+/* Progress bar */
+.progress-track {
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+/* ===== SCREEN 1: DASHBOARD ===== */
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0 20px;
+}
+
+.dash-header .greeting {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.dash-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-gold), #e8c76a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--bg-primary);
+}
+
+/* Hero tracking card */
+.hero-tracking {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(78, 205, 196, 0.15);
+  padding: 20px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-tracking::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(78, 205, 196, 0.08) 0%, transparent 70%);
+}
+
+.hero-tracking-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--accent-mint);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hero-tracking-label svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--accent-mint);
+  fill: none;
+  stroke-width: 2;
+}
+
+.tracking-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.tracking-item:last-child { border-bottom: none; }
+
+.tracking-brand-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.tracking-details { flex: 1; }
+.tracking-details .brand-name {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+.tracking-details .tracking-status {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.tracking-eta {
+  text-align: right;
+}
+.tracking-eta .eta-date {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--accent-mint);
+}
+.tracking-eta .eta-label {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.tracking-progress {
+  margin-top: 4px;
+}
+
+/* Deals section */
+.deal-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.deal-card:hover { background: var(--bg-card-hover); }
+
+.deal-brand-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.deal-info { flex: 1; }
+.deal-info .deal-brand {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+.deal-info .deal-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.deal-badge {
+  background: var(--accent-gold-dim);
+  border: 1px solid rgba(212, 168, 83, 0.25);
+  color: var(--accent-gold);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Syne', sans-serif;
+  white-space: nowrap;
+}
+
+/* Brand pills (horizontal scroll) */
+.brands-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 24px;
+  scrollbar-width: none;
+}
+.brands-scroll::-webkit-scrollbar { display: none; }
+
+.brand-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.brand-pill-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  position: relative;
+  transition: transform 0.2s;
+}
+.brand-pill:hover .brand-pill-icon { transform: scale(1.05); }
+
+.brand-pill-name {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  max-width: 60px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.brand-pill-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--bg-primary);
+}
+
+/* Abandoned carts */
+.cart-mini {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.cart-mini:hover { background: var(--bg-card-hover); }
+
+.cart-mini-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.cart-mini-info { flex: 1; }
+.cart-mini-info .cart-brand {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 1px;
+}
+.cart-mini-info .cart-items {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.cart-mini-right {
+  text-align: right;
+}
+.cart-mini-right .cart-total {
+  font-weight: 600;
+  font-size: 14px;
+}
+.cart-mini-right .cart-age {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.ai-nudge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: rgba(167, 139, 250, 0.08);
+  border-radius: 8px;
+  border: 1px solid rgba(167, 139, 250, 0.12);
+}
+.ai-nudge svg {
+  width: 12px;
+  height: 12px;
+  stroke: var(--accent-violet);
+  fill: none;
+  stroke-width: 2;
+  flex-shrink: 0;
+}
+.ai-nudge span {
+  font-size: 11px;
+  color: var(--accent-violet);
+  font-weight: 500;
+}
+
+/* ===== SCREEN 2: CART DETAIL ===== */
+.screen-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 8px 0 16px;
+  font-weight: 500;
+}
+.screen-back svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--text-secondary);
+  fill: none;
+  stroke-width: 2;
+}
+
+.cart-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.cart-header-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.cart-header-info h2 { margin-bottom: 2px; }
+.cart-header-info .cart-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.cart-item-row {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.cart-item-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.cart-item-details { flex: 1; }
+.cart-item-details .item-name {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+.cart-item-details .item-variant {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.item-prices {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.item-price {
+  font-weight: 700;
+  font-size: 15px;
+}
+.item-price-original {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+/* Price chart */
+.price-chart-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.price-chart {
+  height: 120px;
+  position: relative;
+  margin: 12px 0 8px;
+}
+
+.chart-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* AI prediction */
+.ai-prediction {
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.08), rgba(78, 205, 196, 0.05));
+  border: 1px solid rgba(167, 139, 250, 0.15);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.ai-prediction-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.ai-prediction-header svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--accent-violet);
+  fill: none;
+  stroke-width: 2;
+}
+.ai-prediction-header h3 {
+  color: var(--accent-violet);
+}
+
+.prediction-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.prediction-confidence {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.prediction-confidence span {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.confidence-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.confidence-fill {
+  height: 100%;
+  background: var(--accent-violet);
+  border-radius: 2px;
+}
+
+/* Approve button */
+.approve-section {
+  margin: 20px 0 12px;
+}
+
+.wallet-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.wallet-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.wallet-balance {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--accent-gold);
+}
+
+.btn-approve {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--accent-gold), #e8c76a);
+  color: var(--bg-primary);
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.btn-approve:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(212, 168, 83, 0.3);
+}
+
+.btn-approve .btn-sub {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  opacity: 0.7;
+  display: block;
+  margin-top: 2px;
+}
+
+/* ===== SCREEN 3: RETAILER PROFILE ===== */
+.retailer-hero {
+  text-align: center;
+  padding: 16px 0 20px;
+}
+
+.retailer-big-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 24px;
+  margin: 0 auto 12px;
+}
+
+.retailer-hero h1 { margin-bottom: 4px; }
+.retailer-hero .retailer-url {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.shield-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.shield-icon {
+  position: relative;
+}
+.shield-icon svg {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke-width: 1.8;
+}
+
+.shield-rating {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.shield-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.shield-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.shield-detail-item {
+  text-align: center;
+  padding: 10px 6px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.shield-detail-item .sd-value {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+.shield-detail-item .sd-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Alias info */
+.alias-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.alias-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.alias-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.alias-value {
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Syne', monospace;
+  color: var(--accent-mint);
+}
+
+.copy-btn {
+  background: rgba(78, 205, 196, 0.1);
+  border: 1px solid rgba(78, 205, 196, 0.2);
+  color: var(--accent-mint);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Order history */
+.order-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.order-row:last-child { border-bottom: none; }
+
+.order-left { }
+.order-id {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.order-date {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.order-right { text-align: right; }
+.order-amount {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+/* Return window */
+.return-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.return-days {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 16px;
+  font-family: 'Syne', sans-serif;
+  flex-shrink: 0;
+}
+.return-days span {
+  font-size: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.return-info { flex: 1; }
+.return-order {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 1px;
+}
+.return-deadline {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* ===== SCREEN 4: INBOX ===== */
+.inbox-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  padding: 3px;
+  margin-bottom: 16px;
+}
+
+.inbox-tab {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.inbox-tab.active {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+.inbox-tab .tab-count {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-coral);
+  margin-left: 3px;
+}
+
+.email-card {
+  padding: 14px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.email-card:hover { background: var(--bg-card-hover); }
+
+.email-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.email-from {
+  font-weight: 600;
+  font-size: 13px;
+}
+.email-time {
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.email-subject {
+  font-size: 13px;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.email-preview {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.email-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.promo-highlight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  background: linear-gradient(135deg, rgba(212, 168, 83, 0.08), rgba(212, 168, 83, 0.03));
+  border: 1px solid rgba(212, 168, 83, 0.15);
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+}
+
+.promo-code {
+  font-family: 'Syne', monospace;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--accent-gold);
+  letter-spacing: 1px;
+}
+
+.promo-details { flex: 1; }
+.promo-brand {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 1px;
+}
+.promo-expires {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.promo-apply-btn {
+  padding: 8px 14px;
+  background: var(--accent-gold);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+}
+
+/* Wishlist card */
+.wishlist-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.wishlist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.wishlist-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.share-btn {
+  padding: 4px 10px;
+  background: var(--accent-violet-dim);
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  color: var(--accent-violet);
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.wishlist-items {
+  display: flex;
+  gap: 8px;
+}
+
+.wishlist-item-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in > * {
+  animation: fadeInUp 0.4s ease backwards;
+}
+.animate-in > *:nth-child(1) { animation-delay: 0.05s; }
+.animate-in > *:nth-child(2) { animation-delay: 0.1s; }
+.animate-in > *:nth-child(3) { animation-delay: 0.15s; }
+.animate-in > *:nth-child(4) { animation-delay: 0.2s; }
+.animate-in > *:nth-child(5) { animation-delay: 0.25s; }
+.animate-in > *:nth-child(6) { animation-delay: 0.3s; }
+.animate-in > *:nth-child(7) { animation-delay: 0.35s; }
+.animate-in > *:nth-child(8) { animation-delay: 0.4s; }
+.animate-in > *:nth-child(9) { animation-delay: 0.45s; }
+.animate-in > *:nth-child(10) { animation-delay: 0.5s; }
+.animate-in > *:nth-child(11) { animation-delay: 0.55s; }
+
+/* Wallet screen styles */
+.wallet-overview {
+  background: linear-gradient(135deg, #1a1a2e, #1e1e30);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(212, 168, 83, 0.15);
+  padding: 24px 20px;
+  margin-bottom: 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.wallet-overview::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -30%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(212, 168, 83, 0.06) 0%, transparent 70%);
+}
+
+.wallet-total-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.wallet-total-amount {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 36px;
+  color: var(--accent-gold);
+  margin-bottom: 4px;
+}
+.wallet-total-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.wallet-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.wallet-action-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+.wallet-action-btn:hover { background: var(--bg-card-hover); }
+
+.wallet-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.wallet-brand-info { flex: 1; }
+.wallet-brand-name {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 1px;
+}
+.wallet-brand-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.wallet-brand-balance {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--accent-gold);
+}
+
+/* Home indicator */
+.home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+  z-index: 100;
+}
+
+</style>
+</head>
+<body>
+
+<div class="iphone-frame">
+  <div class="dynamic-island"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-bar-right">
+      <div class="signal-bars">
+        <div class="signal-bar" style="height:4px"></div>
+        <div class="signal-bar" style="height:6px"></div>
+        <div class="signal-bar" style="height:8px"></div>
+        <div class="signal-bar" style="height:11px"></div>
+      </div>
+      <span style="font-size:12px">5G</span>
+      <div class="battery"><div class="battery-fill"></div></div>
+    </div>
+  </div>
+
+  <div class="screen-container">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="screen active animate-in" id="screen-dashboard">
+      <div class="dash-header">
+        <div>
+          <div class="greeting">Good evening, Gabi</div>
+          <h1>Secret Shopper</h1>
+        </div>
+        <div class="dash-avatar">G</div>
+      </div>
+
+      <!-- Hero: Active Shipments -->
+      <div class="hero-tracking">
+        <div class="hero-tracking-label">
+          <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          3 PACKAGES IN TRANSIT
+        </div>
+        <div class="tracking-item" onclick="navigateTo('retailer')">
+          <div class="tracking-brand-icon" style="background:linear-gradient(135deg,#ff6b35,#f7c948); color:#000">N</div>
+          <div class="tracking-details">
+            <div class="brand-name">Nike</div>
+            <div class="tracking-status">Out for delivery — Philadelphia, PA</div>
+            <div class="tracking-progress" style="margin-top:6px">
+              <div class="progress-track"><div class="progress-fill" style="width:92%; background:var(--accent-mint)"></div></div>
+            </div>
+          </div>
+          <div class="tracking-eta">
+            <div class="eta-date">Today</div>
+            <div class="eta-label">by 8pm</div>
+          </div>
+        </div>
+        <div class="tracking-item">
+          <div class="tracking-brand-icon" style="background:linear-gradient(135deg,#0a0a0a,#333); color:#fff; border:1px solid rgba(255,255,255,0.1)">A</div>
+          <div class="tracking-details">
+            <div class="brand-name">Apple</div>
+            <div class="tracking-status">In transit — Memphis, TN</div>
+            <div class="tracking-progress" style="margin-top:6px">
+              <div class="progress-track"><div class="progress-fill" style="width:60%; background:var(--accent-mint)"></div></div>
+            </div>
+          </div>
+          <div class="tracking-eta">
+            <div class="eta-date">Mar 14</div>
+            <div class="eta-label">estimated</div>
+          </div>
+        </div>
+        <div class="tracking-item">
+          <div class="tracking-brand-icon" style="background:linear-gradient(135deg,#e91e8c,#ff69b4); color:#fff">G</div>
+          <div class="tracking-details">
+            <div class="brand-name">Glossier</div>
+            <div class="tracking-status">Label created — awaiting pickup</div>
+            <div class="tracking-progress" style="margin-top:6px">
+              <div class="progress-track"><div class="progress-fill" style="width:15%; background:var(--accent-gold)"></div></div>
+            </div>
+          </div>
+          <div class="tracking-eta">
+            <div class="eta-date">Mar 17</div>
+            <div class="eta-label">estimated</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Your Brands -->
+      <div class="section-label">Your Brands</div>
+      <div class="brands-scroll">
+        <div class="brand-pill" onclick="navigateTo('retailer')">
+          <div class="brand-pill-icon" style="background:linear-gradient(135deg,#ff6b35,#f7c948); color:#000">
+            N
+            <div class="brand-pill-badge" style="background:var(--accent-mint); color:#000">&#10003;</div>
+          </div>
+          <div class="brand-pill-name">Nike</div>
+        </div>
+        <div class="brand-pill">
+          <div class="brand-pill-icon" style="background:linear-gradient(135deg,#0a0a0a,#333); color:#fff; border:1px solid rgba(255,255,255,0.15)">
+            A
+            <div class="brand-pill-badge" style="background:var(--accent-mint); color:#000">&#10003;</div>
+          </div>
+          <div class="brand-pill-name">Apple</div>
+        </div>
+        <div class="brand-pill">
+          <div class="brand-pill-icon" style="background:linear-gradient(135deg,#FF9900,#FFB84D); color:#000">
+            A
+            <div class="brand-pill-badge" style="background:var(--accent-coral); color:#fff">2</div>
+          </div>
+          <div class="brand-pill-name">Amazon</div>
+        </div>
+        <div class="brand-pill">
+          <div class="brand-pill-icon" style="background:linear-gradient(135deg,#e91e8c,#ff69b4); color:#fff">
+            G
+          </div>
+          <div class="brand-pill-name">Glossier</div>
+        </div>
+        <div class="brand-pill">
+          <div class="brand-pill-icon" style="background:linear-gradient(135deg,#1a4731,#2d6a4f); color:#4ecdc4">
+            RE
+          </div>
+          <div class="brand-pill-name">REI</div>
+        </div>
+        <div class="brand-pill">
+          <div class="brand-pill-icon" style="background:linear-gradient(135deg,#c41230,#e8243c); color:#fff">
+            TJ
+          </div>
+          <div class="brand-pill-name">Trader Joe's</div>
+        </div>
+        <div class="brand-pill">
+          <div class="brand-pill-icon" style="background:linear-gradient(135deg,#003087,#009cde); color:#fff">
+            PP
+          </div>
+          <div class="brand-pill-name">Patagonia</div>
+        </div>
+      </div>
+
+      <!-- Recent Deals -->
+      <div class="section-label">Recent Deals for You</div>
+      <div class="deal-card" onclick="navigateTo('inbox')">
+        <div class="deal-brand-icon" style="background:linear-gradient(135deg,#FF9900,#FFB84D); color:#000">A</div>
+        <div class="deal-info">
+          <div class="deal-brand">Amazon</div>
+          <div class="deal-desc">Lightning deal on your saved AirPods Max</div>
+        </div>
+        <div class="deal-badge">-32%</div>
+      </div>
+      <div class="deal-card">
+        <div class="deal-brand-icon" style="background:linear-gradient(135deg,#ff6b35,#f7c948); color:#000">N</div>
+        <div class="deal-info">
+          <div class="deal-brand">Nike</div>
+          <div class="deal-desc">Member-exclusive: extra 25% off clearance</div>
+        </div>
+        <div class="deal-badge">25%</div>
+      </div>
+      <div class="deal-card">
+        <div class="deal-brand-icon" style="background:linear-gradient(135deg,#1a4731,#2d6a4f); color:#4ecdc4">RE</div>
+        <div class="deal-info">
+          <div class="deal-brand">REI</div>
+          <div class="deal-desc">Anniversary sale — 20% one full-price item</div>
+        </div>
+        <div class="deal-badge">20%</div>
+      </div>
+
+      <!-- Abandoned Carts -->
+      <div style="margin-top:24px">
+        <div class="section-label">Abandoned Carts</div>
+        <div class="cart-mini" onclick="navigateTo('cart')">
+          <div class="cart-mini-icon" style="background:linear-gradient(135deg,#FF9900,#FFB84D); color:#000">A</div>
+          <div class="cart-mini-info">
+            <div class="cart-brand">Amazon</div>
+            <div class="cart-items">3 items</div>
+            <div class="ai-nudge">
+              <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
+              <span>Promo likely in 2 days — Amazon sends codes after 5-day abandon</span>
+            </div>
+          </div>
+          <div class="cart-mini-right">
+            <div class="cart-total">$247.83</div>
+            <div class="cart-age">3 days</div>
+          </div>
+        </div>
+        <div class="cart-mini">
+          <div class="cart-mini-icon" style="background:linear-gradient(135deg,#1a4731,#2d6a4f); color:#4ecdc4">RE</div>
+          <div class="cart-mini-info">
+            <div class="cart-brand">REI</div>
+            <div class="cart-items">1 item — Trail Runner 2.0</div>
+          </div>
+          <div class="cart-mini-right">
+            <div class="cart-total">$134.99</div>
+            <div class="cart-age">7 days</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wishlists -->
+      <div style="margin-top:24px">
+        <div class="section-label">Shared Wishlists</div>
+        <div class="wishlist-card">
+          <div class="wishlist-header">
+            <div class="wishlist-name">Birthday Picks 2026</div>
+            <button class="share-btn">Share Link</button>
+          </div>
+          <div class="wishlist-items">
+            <div class="wishlist-item-thumb">&#127873;</div>
+            <div class="wishlist-item-thumb">&#128085;</div>
+            <div class="wishlist-item-thumb">&#128218;</div>
+            <div class="wishlist-item-thumb">&#127911;</div>
+            <div class="wishlist-item-thumb" style="font-size:13px; color:var(--text-muted)">+3</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:20px"></div>
+    </div>
+
+    <!-- ===== CART DETAIL ===== -->
+    <div class="screen animate-in" id="screen-cart">
+      <div class="screen-back" onclick="navigateTo('dashboard')">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+      </div>
+
+      <div class="cart-header">
+        <div class="cart-header-icon" style="background:linear-gradient(135deg,#FF9900,#FFB84D); color:#000">A</div>
+        <div class="cart-header-info">
+          <h2>Amazon Cart</h2>
+          <div class="cart-subtitle">3 items &middot; Abandoned 3 days ago</div>
+        </div>
+      </div>
+
+      <div class="cart-item-row">
+        <div class="cart-item-img">&#127911;</div>
+        <div class="cart-item-details">
+          <div class="item-name">Sony WH-1000XM5</div>
+          <div class="item-variant">Color: Black</div>
+          <div class="item-prices">
+            <span class="item-price">$328.00</span>
+            <span class="item-price-original">$399.99</span>
+          </div>
+          <div style="margin-top:4px"><span class="tag tag-gold">Price dropped $72</span></div>
+        </div>
+      </div>
+
+      <div class="cart-item-row">
+        <div class="cart-item-img">&#128268;</div>
+        <div class="cart-item-details">
+          <div class="item-name">Anker USB-C Hub 7-in-1</div>
+          <div class="item-variant">Space Gray</div>
+          <div class="item-prices">
+            <span class="item-price">$34.99</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cart-item-row">
+        <div class="cart-item-img">&#128218;</div>
+        <div class="cart-item-details">
+          <div class="item-name">Designing Data-Intensive Apps</div>
+          <div class="item-variant">Paperback</div>
+          <div class="item-prices">
+            <span class="item-price">$33.36</span>
+            <span class="item-price-original">$44.99</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Price History Chart -->
+      <div class="price-chart-card">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <h3>Price History — Sony WH-1000XM5</h3>
+          <span class="tag tag-mint">&#9660; $72</span>
+        </div>
+        <div class="price-chart">
+          <svg class="chart-svg" viewBox="0 0 320 100" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(78,205,196,0.3)"/>
+                <stop offset="100%" stop-color="rgba(78,205,196,0)"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,20 L40,22 L80,18 L120,25 L160,15 L200,30 L240,45 L280,42 L320,60" fill="none" stroke="var(--accent-mint)" stroke-width="2"/>
+            <path d="M0,20 L40,22 L80,18 L120,25 L160,15 L200,30 L240,45 L280,42 L320,60 L320,100 L0,100Z" fill="url(#chartGrad)"/>
+            <!-- Current price marker -->
+            <circle cx="320" cy="60" r="4" fill="var(--accent-mint)"/>
+            <!-- Highest point -->
+            <line x1="0" y1="15" x2="320" y2="15" stroke="rgba(255,107,107,0.2)" stroke-dasharray="4,4"/>
+            <text x="324" y="18" fill="var(--accent-coral)" font-size="8" font-family="Plus Jakarta Sans">$399</text>
+            <!-- Current -->
+            <text x="324" y="63" fill="var(--accent-mint)" font-size="8" font-family="Plus Jakarta Sans">$328</text>
+          </svg>
+        </div>
+        <div class="chart-labels">
+          <span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span>
+        </div>
+      </div>
+
+      <!-- AI Prediction -->
+      <div class="ai-prediction">
+        <div class="ai-prediction-header">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
+          <h3>Agent Prediction</h3>
+        </div>
+        <div class="prediction-text">
+          Amazon typically sends a <strong>10-15% promo code</strong> after 5 days of cart abandonment for electronics. You're at day 3. <strong>Wait 2 more days</strong> for a likely code worth ~$33-49 off your cart total.
+        </div>
+        <div class="prediction-confidence">
+          <span>Confidence</span>
+          <div class="confidence-bar"><div class="confidence-fill" style="width:78%"></div></div>
+          <span style="color:var(--accent-violet); font-weight:600">78%</span>
+        </div>
+      </div>
+
+      <!-- Approve to Buy -->
+      <div class="approve-section">
+        <div class="wallet-info">
+          <span class="wallet-label">Amazon Wallet</span>
+          <span class="wallet-balance">$400.00</span>
+        </div>
+        <button class="btn-approve">
+          Approve $247.83
+          <span class="btn-sub">Pays from Amazon wallet &middot; alias checkout</span>
+        </button>
+      </div>
+
+      <div style="height:20px"></div>
+    </div>
+
+    <!-- ===== RETAILER PROFILE ===== -->
+    <div class="screen animate-in" id="screen-retailer">
+      <div class="screen-back" onclick="navigateTo('dashboard')">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+      </div>
+
+      <div class="retailer-hero">
+        <div class="retailer-big-icon" style="background:linear-gradient(135deg,#ff6b35,#f7c948); color:#000">N</div>
+        <h1>Nike</h1>
+        <div class="retailer-url">nike.com</div>
+        <div class="shield-score">
+          <div class="shield-icon">
+            <svg viewBox="0 0 24 24" style="stroke:#4ecdc4"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <span class="shield-rating" style="color:var(--accent-mint)">A-</span>
+          <span class="shield-label">Shield Score</span>
+        </div>
+      </div>
+
+      <div class="shield-details">
+        <div class="shield-detail-item">
+          <div class="sd-value" style="color:var(--accent-mint)">Low</div>
+          <div class="sd-label">Email Spam</div>
+        </div>
+        <div class="shield-detail-item">
+          <div class="sd-value" style="color:var(--accent-gold)">Med</div>
+          <div class="sd-label">Data Sharing</div>
+        </div>
+        <div class="shield-detail-item">
+          <div class="sd-value" style="color:var(--accent-mint)">None</div>
+          <div class="sd-label">Dark Patterns</div>
+        </div>
+      </div>
+
+      <!-- Alias -->
+      <div class="section-label" style="margin-top:20px">Email Alias</div>
+      <div class="alias-card">
+        <div class="alias-row">
+          <div>
+            <div class="alias-label">Alias for nike.com</div>
+            <div class="alias-value">gabi.xk7m@secretshopper.me</div>
+          </div>
+          <button class="copy-btn">Copy</button>
+        </div>
+      </div>
+
+      <!-- Wallet -->
+      <div class="section-label" style="margin-top:20px">Wallet</div>
+      <div class="alias-card">
+        <div class="alias-row">
+          <div>
+            <div class="alias-label">Nike Wallet Balance</div>
+            <div style="font-weight:700; font-size:22px; color:var(--accent-gold); font-family:'Syne',sans-serif">$150.00</div>
+          </div>
+          <button class="copy-btn" style="background:var(--accent-gold-dim); border-color:rgba(212,168,83,0.2); color:var(--accent-gold)">Add Funds</button>
+        </div>
+      </div>
+
+      <!-- Return Windows -->
+      <div class="section-label" style="margin-top:20px">Return Windows</div>
+      <div class="return-card">
+        <div class="return-days" style="background:var(--accent-coral-dim); color:var(--accent-coral)">
+          4
+          <span>days</span>
+        </div>
+        <div class="return-info">
+          <div class="return-order">Air Max 90 — Order #NK-8834</div>
+          <div class="return-deadline">Return by Mar 15, 2026</div>
+        </div>
+      </div>
+      <div class="return-card">
+        <div class="return-days" style="background:var(--accent-mint-dim); color:var(--accent-mint)">
+          22
+          <span>days</span>
+        </div>
+        <div class="return-info">
+          <div class="return-order">Dri-FIT Tee — Order #NK-9012</div>
+          <div class="return-deadline">Return by Apr 2, 2026</div>
+        </div>
+      </div>
+
+      <!-- Order History -->
+      <div class="section-label" style="margin-top:20px">Order History</div>
+      <div class="alias-card" style="padding:4px 14px">
+        <div class="order-row">
+          <div class="order-left">
+            <div class="order-id">#NK-9012</div>
+            <div class="order-date">Mar 2, 2026</div>
+          </div>
+          <div class="order-right">
+            <div class="order-amount">$42.00</div>
+            <span class="tag tag-mint" style="font-size:10px">Delivered</span>
+          </div>
+        </div>
+        <div class="order-row">
+          <div class="order-left">
+            <div class="order-id">#NK-8834</div>
+            <div class="order-date">Feb 18, 2026</div>
+          </div>
+          <div class="order-right">
+            <div class="order-amount">$129.99</div>
+            <span class="tag tag-mint" style="font-size:10px">Delivered</span>
+          </div>
+        </div>
+        <div class="order-row">
+          <div class="order-left">
+            <div class="order-id">#NK-7201</div>
+            <div class="order-date">Jan 5, 2026</div>
+          </div>
+          <div class="order-right">
+            <div class="order-amount">$215.00</div>
+            <span class="tag tag-mint" style="font-size:10px">Delivered</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:20px"></div>
+    </div>
+
+    <!-- ===== INBOX ===== -->
+    <div class="screen animate-in" id="screen-inbox">
+      <div style="padding:8px 0 16px; display:flex; justify-content:space-between; align-items:center">
+        <h1>Inbox</h1>
+        <span class="tag tag-coral">5 new</span>
+      </div>
+
+      <div class="inbox-tabs">
+        <div class="inbox-tab active" onclick="switchTab(this, 'tracking')">Tracking <span class="tab-count">3</span></div>
+        <div class="inbox-tab" onclick="switchTab(this, 'promos')">Promos <span class="tab-count">4</span></div>
+        <div class="inbox-tab" onclick="switchTab(this, 'blocked')">Blocked</div>
+      </div>
+
+      <!-- Tracking Tab -->
+      <div class="inbox-content" id="tab-tracking">
+        <div class="email-card">
+          <div class="email-top">
+            <span class="email-from">Nike via alias</span>
+            <span class="email-time">2h ago</span>
+          </div>
+          <div class="email-subject">Your order has shipped!</div>
+          <div class="email-preview">Order #NK-9912 is on its way. Estimated delivery: Today by 8pm. Track your package...</div>
+          <div class="email-tags">
+            <span class="tag tag-mint">Tracking extracted</span>
+            <span class="tag tag-gold">Forwarded</span>
+          </div>
+        </div>
+
+        <div class="email-card">
+          <div class="email-top">
+            <span class="email-from">Apple via alias</span>
+            <span class="email-time">1d ago</span>
+          </div>
+          <div class="email-subject">Your MacBook Pro is in transit</div>
+          <div class="email-preview">Great news! Your order is on its way to you. Current location: Memphis, TN hub...</div>
+          <div class="email-tags">
+            <span class="tag tag-mint">Tracking extracted</span>
+            <span class="tag tag-gold">Forwarded</span>
+          </div>
+        </div>
+
+        <div class="email-card">
+          <div class="email-top">
+            <span class="email-from">Glossier via alias</span>
+            <span class="email-time">3d ago</span>
+          </div>
+          <div class="email-subject">Order confirmed — shipping soon</div>
+          <div class="email-preview">We're getting your order ready! You'll receive tracking info once it ships...</div>
+          <div class="email-tags">
+            <span class="tag tag-gold">Forwarded</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Promos Tab -->
+      <div class="inbox-content" id="tab-promos" style="display:none">
+        <div class="promo-highlight">
+          <div>
+            <div class="promo-code">SAVE25</div>
+          </div>
+          <div class="promo-details">
+            <div class="promo-brand">Nike — 25% off clearance</div>
+            <div class="promo-expires">Expires Mar 15</div>
+          </div>
+          <button class="promo-apply-btn">Apply</button>
+        </div>
+
+        <div class="promo-highlight">
+          <div>
+            <div class="promo-code">SPRING15</div>
+          </div>
+          <div class="promo-details">
+            <div class="promo-brand">REI — 15% one item</div>
+            <div class="promo-expires">Expires Mar 20</div>
+          </div>
+          <button class="promo-apply-btn">Apply</button>
+        </div>
+
+        <div class="email-card">
+          <div class="email-top">
+            <span class="email-from">Amazon via alias</span>
+            <span class="email-time">5h ago</span>
+          </div>
+          <div class="email-subject">Still thinking about it? Here's 10% off</div>
+          <div class="email-preview">We noticed you left some items in your cart. Use code COMEBACK10 for 10% off your next order...</div>
+          <div class="email-tags">
+            <span class="tag tag-gold">Code: COMEBACK10</span>
+            <span class="tag tag-violet">AI predicted this</span>
+          </div>
+        </div>
+
+        <div class="email-card">
+          <div class="email-top">
+            <span class="email-from">Glossier via alias</span>
+            <span class="email-time">2d ago</span>
+          </div>
+          <div class="email-subject">Free shipping on your next order!</div>
+          <div class="email-preview">As a thank you for your recent purchase, enjoy free shipping on your next order. No minimum...</div>
+          <div class="email-tags">
+            <span class="tag tag-gold">Free shipping</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blocked Tab -->
+      <div class="inbox-content" id="tab-blocked" style="display:none">
+        <div style="text-align:center; padding:40px 20px; color:var(--text-muted)">
+          <div style="font-size:40px; margin-bottom:12px">&#128737;</div>
+          <h3 style="color:var(--text-secondary); margin-bottom:8px">47 emails blocked this month</h3>
+          <p style="font-size:13px; line-height:1.5">Marketing newsletters, "We miss you" campaigns, and survey requests — all filtered by your aliases. Only tracking and promos get through.</p>
+        </div>
+        <div class="email-card" style="opacity:0.5">
+          <div class="email-top">
+            <span class="email-from">Nike via alias</span>
+            <span class="email-time">1d ago</span>
+          </div>
+          <div class="email-subject">Take our quick survey for 10% off!</div>
+          <div class="email-tags">
+            <span class="tag tag-coral">Blocked — survey</span>
+          </div>
+        </div>
+        <div class="email-card" style="opacity:0.5">
+          <div class="email-top">
+            <span class="email-from">Amazon via alias</span>
+            <span class="email-time">2d ago</span>
+          </div>
+          <div class="email-subject">Recommended for you: Top picks in Electronics</div>
+          <div class="email-tags">
+            <span class="tag tag-coral">Blocked — marketing</span>
+          </div>
+        </div>
+        <div class="email-card" style="opacity:0.5">
+          <div class="email-top">
+            <span class="email-from">Glossier via alias</span>
+            <span class="email-time">3d ago</span>
+          </div>
+          <div class="email-subject">New arrivals you'll love &#10084;&#65039;</div>
+          <div class="email-tags">
+            <span class="tag tag-coral">Blocked — marketing</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:20px"></div>
+    </div>
+
+    <!-- ===== WALLET SCREEN ===== -->
+    <div class="screen animate-in" id="screen-wallet">
+      <div style="padding:8px 0 16px">
+        <h1>Wallet</h1>
+      </div>
+
+      <div class="wallet-overview">
+        <div class="wallet-total-label">Total Balance</div>
+        <div class="wallet-total-amount">$725.00</div>
+        <div class="wallet-total-sub">Across 4 retailer wallets</div>
+      </div>
+
+      <div class="wallet-actions">
+        <div class="wallet-action-btn">+ Add Funds</div>
+        <div class="wallet-action-btn">Transfer</div>
+        <div class="wallet-action-btn">History</div>
+      </div>
+
+      <div class="section-label">Retailer Wallets</div>
+      <div class="wallet-brand-row">
+        <div class="deal-brand-icon" style="background:linear-gradient(135deg,#FF9900,#FFB84D); color:#000; width:40px; height:40px; font-size:14px">A</div>
+        <div class="wallet-brand-info">
+          <div class="wallet-brand-name">Amazon</div>
+          <div class="wallet-brand-sub">Last used 3 days ago</div>
+        </div>
+        <div class="wallet-brand-balance">$400.00</div>
+      </div>
+      <div class="wallet-brand-row">
+        <div class="deal-brand-icon" style="background:linear-gradient(135deg,#ff6b35,#f7c948); color:#000; width:40px; height:40px; font-size:14px">N</div>
+        <div class="wallet-brand-info">
+          <div class="wallet-brand-name">Nike</div>
+          <div class="wallet-brand-sub">Last used 12 days ago</div>
+        </div>
+        <div class="wallet-brand-balance">$150.00</div>
+      </div>
+      <div class="wallet-brand-row">
+        <div class="deal-brand-icon" style="background:linear-gradient(135deg,#0a0a0a,#333); color:#fff; width:40px; height:40px; font-size:14px; border:1px solid rgba(255,255,255,0.1)">A</div>
+        <div class="wallet-brand-info">
+          <div class="wallet-brand-name">Apple</div>
+          <div class="wallet-brand-sub">Pending purchase — $1,299</div>
+        </div>
+        <div class="wallet-brand-balance">$125.00</div>
+      </div>
+      <div class="wallet-brand-row">
+        <div class="deal-brand-icon" style="background:linear-gradient(135deg,#1a4731,#2d6a4f); color:#4ecdc4; width:40px; height:40px; font-size:14px">RE</div>
+        <div class="wallet-brand-info">
+          <div class="wallet-brand-name">REI</div>
+          <div class="wallet-brand-sub">Cart waiting — $134.99</div>
+        </div>
+        <div class="wallet-brand-balance">$50.00</div>
+      </div>
+
+      <div class="section-label" style="margin-top:24px">Recent Transactions</div>
+      <div class="alias-card" style="padding:4px 14px">
+        <div class="order-row">
+          <div class="order-left">
+            <div class="order-id">Nike — Dri-FIT Tee</div>
+            <div class="order-date">Mar 2, 2026</div>
+          </div>
+          <div class="order-right">
+            <div class="order-amount" style="color:var(--accent-coral)">-$42.00</div>
+          </div>
+        </div>
+        <div class="order-row">
+          <div class="order-left">
+            <div class="order-id">Amazon — Wallet Top-up</div>
+            <div class="order-date">Feb 28, 2026</div>
+          </div>
+          <div class="order-right">
+            <div class="order-amount" style="color:var(--accent-mint)">+$400.00</div>
+          </div>
+        </div>
+        <div class="order-row">
+          <div class="order-left">
+            <div class="order-id">Nike — Air Max 90</div>
+            <div class="order-date">Feb 18, 2026</div>
+          </div>
+          <div class="order-right">
+            <div class="order-amount" style="color:var(--accent-coral)">-$129.99</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:20px"></div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="navigateTo('dashboard')">
+      <div class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <span>Home</span>
+    </div>
+    <div class="nav-item" onclick="navigateTo('cart')">
+      <div class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+        <div class="nav-badge">2</div>
+      </div>
+      <span>Carts</span>
+    </div>
+    <div class="nav-item" onclick="navigateTo('inbox')">
+      <div class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <div class="nav-badge">5</div>
+      </div>
+      <span>Inbox</span>
+    </div>
+    <div class="nav-item" onclick="navigateTo('wallet')">
+      <div class="nav-icon-wrap">
+        <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M16 12h.01"/><path d="M2 10h20"/></svg>
+      </div>
+      <span>Wallet</span>
+    </div>
+  </div>
+
+  <div class="home-indicator"></div>
+</div>
+
+<script>
+function navigateTo(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + screen).classList.add('active');
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navMap = { dashboard: 0, cart: 1, inbox: 2, wallet: 3, retailer: 0 };
+  const navItems = document.querySelectorAll('.nav-item');
+  if (navItems[navMap[screen]]) navItems[navMap[screen]].classList.add('active');
+
+  // Re-trigger animations
+  const el = document.getElementById('screen-' + screen);
+  el.classList.remove('animate-in');
+  void el.offsetWidth;
+  el.classList.add('animate-in');
+  el.scrollTop = 0;
+}
+
+function switchTab(tabEl, tabId) {
+  document.querySelectorAll('.inbox-tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.querySelectorAll('.inbox-content').forEach(c => c.style.display = 'none');
+  document.getElementById('tab-' + tabId).style.display = 'block';
+}
+</script>
+
+</body>
+</html>
